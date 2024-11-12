@@ -11,6 +11,7 @@ import java.util.UUID;
 public class Crew {
     @Id
     private final UUID id;
+    private String name;
 
     protected Crew() {
         id = null;
