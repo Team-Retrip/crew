@@ -4,4 +4,5 @@ import java.util.UUID;
 
 public class Trip {
     private UUID id;
+    private String name;
 }
