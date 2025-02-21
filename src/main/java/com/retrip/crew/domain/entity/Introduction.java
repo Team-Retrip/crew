@@ -1,7 +1,7 @@
 package com.retrip.crew.domain.entity;
 
-import com.retrip.crew.domain.vo.NotificationBoardContent;
-import com.retrip.crew.domain.vo.SelfIntroduceBoardContent;
+import com.retrip.crew.domain.vo.IntroductionContent;
+import com.retrip.crew.domain.vo.IntroductionTitle;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,13 +12,16 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class SelfIntroduceBoard extends BaseEntity {
+public class Introduction extends BaseEntity {
     @Id
     @Column(columnDefinition = "varbinary(16)")
     private UUID id;
 
     @Embedded
-    private SelfIntroduceBoardContent content;
+    private IntroductionTitle title;
+
+    @Embedded
+    private IntroductionContent content;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(

@@ -1,55 +1,64 @@
 package com.retrip.crew.domain.entity;
 
-import com.retrip.crew.domain.vo.CrewContent;
+import com.retrip.crew.domain.vo.CrewDescription;
+import com.retrip.crew.domain.vo.CrewTitle;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
 public class Crew extends BaseEntity {
     @Id
     @Column(columnDefinition = "varbinary(16)")
+    @Getter
     private UUID id;
 
+    @Getter
     @Embedded
-    private CrewContent crewContent;
+    private CrewTitle title;
 
-    @OneToMany(mappedBy = "crew", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CrewMember> leader = new ArrayList<>();
+    @Embedded
+    @Getter
+    private CrewDescription description;
 
-    @OneToMany(mappedBy = "crew", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CrewMember> members = new ArrayList<>();
 
-    @OneToMany(mappedBy = "crew", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FreeBoard> freeBoards = new ArrayList<>();
+    @Embedded
+    private CrewMembers crewMembers;
 
-    @OneToMany(mappedBy = "crew", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<NotificationBoard> notificationBoards = new ArrayList<>();
 
-    @OneToMany(mappedBy = "crew", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SelfIntroduceBoard> selfIntroduceBoards = new ArrayList<>();
+    @Embedded
+    private Posts posts;
+
+    @Embedded
+    private Announcements announcements;
+
+    @Embedded
+    private Introductions introductions;
+
 
     @Version
     private long version;
 
     private Crew(String name, String description, UUID leader) {
         this.id = UUID.randomUUID();
-        this.crewContent = new CrewContent(name, description);
-        this.leader = CrewMember.createLeader(this, leader, Role.LEADER);
-        this.members = new ArrayList<>();
-        this.freeBoards = new ArrayList<>();
-        this.notificationBoards = new ArrayList<>();
-        this.selfIntroduceBoards = new ArrayList<>();
+        this.title = new CrewTitle(name);
+        this.description = new CrewDescription(description);
+        this.crewMembers = new CrewMembers(this, leader);
+        this.posts = new Posts();
+        this.announcements = new Announcements();
+        this.introductions = new Introductions();
     }
 
-    public static Crew create(String name, String description, UUID leader) {
-        return new Crew(name, description, leader);
+    public static Crew create(String title, String description, UUID leader) {
+        return new Crew(title, description, leader);
     }
+
+    public CrewMember getLeader() {
+        return crewMembers.getLeader();
+    }
+
 }

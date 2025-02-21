@@ -1,6 +1,7 @@
 package com.retrip.crew.domain.entity;
 
-import com.retrip.crew.domain.vo.NotificationBoardContent;
+import com.retrip.crew.domain.vo.PostContent;
+import com.retrip.crew.domain.vo.PostTitle;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -11,20 +12,23 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class NotificationBoard extends BaseEntity {
+public class Post extends BaseEntity {
     @Id
     @Column(columnDefinition = "varbinary(16)")
     private UUID id;
 
     @Embedded
-    private NotificationBoardContent content;
+    private PostTitle title;
 
+    @Embedded
+    private PostContent content;
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "crew_id",
             nullable = false,
             columnDefinition = "varbinary(16)",
-            foreignKey = @ForeignKey(name = "fk_notification_board_to_crew")
+            foreignKey = @ForeignKey(name = "fk_free_board_to_crew")
     )
     private Crew crew;
 }

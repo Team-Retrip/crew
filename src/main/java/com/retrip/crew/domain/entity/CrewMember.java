@@ -25,20 +25,16 @@ public class CrewMember extends BaseEntity {
     )
     private Crew crew;
 
-    @Enumerated
-    private Role role;
+    @Column(name = "role", length = 50, nullable = false)
+    private CrewMemberRole crewMemberRole;
 
     @Column(nullable = false)
     private UUID memberId;
 
-    private CrewMember(Crew crew, UUID memberId, Role role) {
+    public CrewMember(Crew crew, UUID memberId, CrewMemberRole crewMemberRole) {
         this.id = UUID.randomUUID();
         this.crew = crew;
         this.memberId = memberId;
-        this.role = Role.valueOf(role.name());
-    }
-
-    public static List<CrewMember> createLeader(Crew crew, UUID memberId, Role role) {
-        return List.of(new CrewMember(crew, memberId, role));
+        this.crewMemberRole = CrewMemberRole.valueOf(crewMemberRole.name());
     }
 }
