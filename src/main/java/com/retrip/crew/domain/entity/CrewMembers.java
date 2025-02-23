@@ -18,7 +18,7 @@ public class CrewMembers {
     @OneToMany(mappedBy = "crew", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CrewMember> values = new ArrayList<>();
 
-    public CrewMembers(Crew crew, UUID member) { //리더 생성
+    public CrewMembers(Crew crew, UUID member) {
         this.values = createLeader(crew, member);
     }
 

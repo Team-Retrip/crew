@@ -1,5 +1,7 @@
 package com.retrip.crew.domain.entity;
 
+import com.retrip.crew.domain.vo.AnnouncementContent;
+import com.retrip.crew.domain.vo.AnnouncementTitle;
 import com.retrip.crew.domain.vo.NotificationBoardContent;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -17,7 +19,10 @@ public class Announcement extends BaseEntity {
     private UUID id;
 
     @Embedded
-    private NotificationBoardContent content;
+    private AnnouncementTitle title;
+
+    @Embedded
+    private AnnouncementContent content;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(

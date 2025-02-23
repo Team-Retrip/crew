@@ -14,7 +14,7 @@ public class Introductions {
     @OneToMany(mappedBy = "crew", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Introduction> values = new ArrayList<>();
 
-    public Introductions() { //리더 생성
+    public Introductions() {
         this.values = createEmptyValues();
     }
 
