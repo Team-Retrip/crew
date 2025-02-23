@@ -14,9 +14,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CrewService implements CreateCrewUseCase {
     private final CrewRepository crewRepository;
+
     @Override
     public CrewCreateResponse createCrew(CrewCreateRequest request) {
-        Crew crew = crewRepository.save(request.to());
+        Crew crew = crewRepository.save(request.to(request.leader()));
+
         return CrewCreateResponse.of(crew);
     }
 }
