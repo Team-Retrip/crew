@@ -1,6 +1,6 @@
 package com.retrip.crew.domain.vo;
 
-import com.retrip.crew.domain.exception.CrewDescriptionException;
+import com.retrip.crew.domain.exception.common.InvalidValueException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
@@ -25,7 +25,7 @@ public class AnnouncementContent {
 
     private void validate(String value) {
         if (value.length() > CONTENT_LENGTH_LIMIT) {
-            throw new CrewDescriptionException("공지 게시글 내용은 " + CONTENT_LENGTH_LIMIT + "자를 넘을 수 없습니다.");
+            throw new InvalidValueException("공지 게시글 내용은 " + CONTENT_LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
     }
 }

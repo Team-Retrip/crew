@@ -1,0 +1,16 @@
+package com.retrip.crew.domain.exception.common;
+
+public class EntityNotFoundException extends BusinessException {
+    private static final ErrorCode errorCode = ErrorCode.ENTITY_NOT_FOUNT;
+    public EntityNotFoundException(ErrorCode errorCode) {
+        super(errorCode);
+    }
+
+    public EntityNotFoundException(String message) {
+        super(errorCode, message);
+    }
+
+    public EntityNotFoundException(ErrorCode errorCode, String message) {
+        super(errorCode, message);
+    }
+}
