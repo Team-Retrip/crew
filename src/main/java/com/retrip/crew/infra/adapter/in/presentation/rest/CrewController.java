@@ -28,24 +28,4 @@ public class CrewController {
         CrewCreateResponse crew = createCrewUseCase.createCrew(request);
         return ResponseEntity.created(URI.create("/crews/" + crew.id())).body(crew);
     }
-
-    @PostMapping("/exception1")
-    public ApiResponse<CrewCreateResponse> exception1(@RequestBody @Valid CrewCreateRequest request) {
-        throw new CrewNotFoundException();
-    }
-
-    @PostMapping("/exception2")
-    public ApiResponse<CrewCreateResponse> exception2(@RequestBody @Valid CrewCreateRequest request) {
-        throw new InvalidValueException(ErrorCode.SERVER_ERROR);
-    }
-
-    @PostMapping("/exception3")
-    public ApiResponse<CrewCreateResponse> exception3(@RequestBody @Valid CrewCreateRequest request) {
-        throw new InvalidValueException("인풋 에러");
-    }
-
-    @PostMapping("/exception4")
-    public ApiResponse<CrewCreateResponse> exception4(@RequestBody @Valid CrewCreateRequest request) {
-        throw new InvalidValueException(ErrorCode.SERVER_ERROR, "서버 에러");
-    }
 }
