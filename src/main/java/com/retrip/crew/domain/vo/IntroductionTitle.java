@@ -1,7 +1,6 @@
 package com.retrip.crew.domain.vo;
 
-import com.retrip.crew.domain.exception.CrewTitleException;
-import com.retrip.crew.domain.exception.IntroductionTitleException;
+import com.retrip.crew.domain.exception.common.InvalidValueException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
@@ -26,7 +25,7 @@ public class IntroductionTitle {
 
     private void validate(String value) {
         if (value.length() > TITLE_LENGTH_LIMIT) {
-            throw new IntroductionTitleException("자기 소개 게시글 제목은 " + TITLE_LENGTH_LIMIT + "자를 넘을 수 없습니다.");
+            throw new InvalidValueException("자기 소개 게시글 제목은 " + TITLE_LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
     }
 }
