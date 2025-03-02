@@ -29,6 +29,8 @@ public class Crew extends BaseEntity {
     @Embedded
     private CrewMembers crewMembers;
 
+    @Column(name = "max_members", nullable = false)
+    private int maxMembers;
 
     @Embedded
     private Posts posts;
@@ -43,18 +45,19 @@ public class Crew extends BaseEntity {
     @Version
     private long version;
 
-    private Crew(String name, String description, UUID leader) {
+    private Crew(String name, String description, int maxMembers, UUID leader) {
         this.id = UUID.randomUUID();
         this.title = new CrewTitle(name);
         this.description = new CrewDescription(description);
+        this.maxMembers = maxMembers;
         this.crewMembers = new CrewMembers(this, leader);
         this.posts = new Posts();
         this.announcements = new Announcements();
         this.introductions = new Introductions();
     }
 
-    public static Crew create(String title, String description, UUID leader) {
-        return new Crew(title, description, leader);
+    public static Crew create(String title, String description, int maxMembers, UUID leader) {
+        return new Crew(title, description, maxMembers, leader);
     }
 
     public CrewMember getLeader() {
