@@ -6,6 +6,8 @@ import com.retrip.crew.application.in.response.CrewCreateResponse;
 import com.retrip.crew.application.in.response.CrewDetailResponse;
 import com.retrip.crew.application.in.response.CrewListResponse;
 import com.retrip.crew.application.in.usecase.CreateCrewUseCase;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import com.retrip.crew.application.in.usecase.GetCrewUseCase;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ApiResponse;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
@@ -21,11 +23,13 @@ import java.net.URI;
 @RequiredArgsConstructor
 @RequestMapping("/crews")
 @RestController
+@Tag(name = "Crew", description = "크루 서비스")
 public class CrewController {
     private final CreateCrewUseCase createCrewUseCase;
     private final GetCrewUseCase getCrewUseCase;
 
     @PostMapping
+    @Schema(description = "크루 생성")
     public ResponseEntity<CrewCreateResponse> createCrew(@RequestBody CrewCreateRequest request) {
         CrewCreateResponse crew = createCrewUseCase.createCrew(request);
         return ResponseEntity.created(URI.create("/crews/" + crew.id())).body(crew);

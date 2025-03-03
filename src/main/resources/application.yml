@@ -20,3 +20,7 @@ logging:
   level:
     org.hibernate.type.descriptor.sql: trace
     org.springframework.web.client.RestTemplate: DEBUG
+
+springdoc:
+  swagger-ui:
+    use-root-path: true
