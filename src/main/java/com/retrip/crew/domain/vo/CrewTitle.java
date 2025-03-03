@@ -1,6 +1,6 @@
 package com.retrip.crew.domain.vo;
 
-import com.retrip.crew.domain.exception.CrewTitleException;
+import com.retrip.crew.domain.exception.common.InvalidValueException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
@@ -25,7 +25,7 @@ public class CrewTitle {
 
     private void validate(String value) {
         if (value.length() > TITLE_LENGTH_LIMIT) {
-            throw new CrewTitleException("크루 제목은 " + TITLE_LENGTH_LIMIT + "자를 넘을 수 없습니다.");
+            throw new InvalidValueException("크루 제목은 " + TITLE_LENGTH_LIMIT + "자를 넘을 수 없습니다.");
         }
     }
 }

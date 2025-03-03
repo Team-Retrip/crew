@@ -2,7 +2,6 @@ package com.retrip.crew.domain.entity;
 
 import com.retrip.crew.domain.vo.AnnouncementContent;
 import com.retrip.crew.domain.vo.AnnouncementTitle;
-import com.retrip.crew.domain.vo.NotificationBoardContent;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
