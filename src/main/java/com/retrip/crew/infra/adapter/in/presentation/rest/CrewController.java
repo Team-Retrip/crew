@@ -3,6 +3,7 @@ package com.retrip.crew.infra.adapter.in.presentation.rest;
 import com.retrip.crew.application.in.request.CrewCreateRequest;
 import com.retrip.crew.application.in.request.CrewOrder;
 import com.retrip.crew.application.in.response.CrewCreateResponse;
+import com.retrip.crew.application.in.response.CrewDetailResponse;
 import com.retrip.crew.application.in.response.CrewListResponse;
 import com.retrip.crew.application.in.usecase.CreateCrewUseCase;
 import com.retrip.crew.application.in.usecase.GetCrewUseCase;
@@ -38,6 +39,14 @@ public class CrewController {
             @PageableDefault(size = 10) Pageable pageable
     ) {
         ScrollPageResponse<CrewListResponse> response = getCrewUseCase.getCrews(pageable, keyword, order, sort);
+        return ResponseEntity.ok().body(ApiResponse.ok(response));
+    }
+
+    @GetMapping("/{crewId}")
+    public ResponseEntity<ApiResponse<CrewDetailResponse>> getCrewDetail(
+            @PathVariable("crewId") UUID crewId
+    ) {
+        CrewDetailResponse response = getCrewUseCase.getCrewDetail(crewId);
         return ResponseEntity.ok().body(ApiResponse.ok(response));
     }
 }

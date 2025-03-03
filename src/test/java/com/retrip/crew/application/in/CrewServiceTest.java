@@ -3,10 +3,13 @@ package com.retrip.crew.application.in;
 import com.retrip.crew.application.in.request.CrewCreateRequest;
 import com.retrip.crew.application.in.request.CrewOrder;
 import com.retrip.crew.application.in.response.CrewCreateResponse;
+import com.retrip.crew.application.in.response.CrewDetailResponse;
 import com.retrip.crew.application.in.response.CrewListResponse;
 import com.retrip.crew.common.BaseTest;
+import com.retrip.crew.domain.entity.CrewMemberRole;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -63,6 +66,30 @@ class CrewServiceTest extends BaseTest {
                 () -> assertThat(response.getList().getFirst().memberCount()).isEqualTo(1),
                 () -> assertThat(response.getList().getFirst().maxMemberCount()).isEqualTo(5),
                 () -> assertThat(response.isHasNext()).isTrue()
+        );
+    }
+
+    @Test
+    void 크루_상세를_조회한다(){
+        //given
+        CrewCreateRequest request = createCrew(
+                정수_ID,
+                "속초 크루원 구함",
+                "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
+                5
+        );
+        UUID crewId = crewService.createCrew(request).id();
+
+        //when
+        CrewDetailResponse response = crewService.getCrewDetail(crewId);
+
+        //then
+        assertAll(
+                () -> assertThat(response.id()).isEqualTo(crewId),
+                () -> assertThat(response.leaderId()).isEqualTo(정수_ID),
+                () -> assertThat(response.members().size()).isEqualTo(1),
+                () -> assertThat(response.members().getFirst().roleCode()).isEqualTo(CrewMemberRole.LEADER.getCode()),
+                () -> assertThat(response.members().getFirst().memberId()).isEqualTo(정수_ID)
         );
     }
 }

@@ -10,21 +10,18 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Crew extends BaseEntity {
     @Id
     @Column(columnDefinition = "varbinary(16)")
-    @Getter
     private UUID id;
 
-    @Getter
     @Embedded
     private CrewTitle title;
 
     @Embedded
-    @Getter
     private CrewDescription description;
-
 
     @Embedded
     private CrewMembers crewMembers;
@@ -40,7 +37,6 @@ public class Crew extends BaseEntity {
 
     @Embedded
     private Introductions introductions;
-
 
     @Version
     private long version;
