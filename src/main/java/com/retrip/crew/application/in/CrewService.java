@@ -1,30 +1,18 @@
 package com.retrip.crew.application.in;
 
 import com.retrip.crew.application.in.request.CrewCreateRequest;
-import com.retrip.crew.application.in.request.CrewOrder;
 import com.retrip.crew.application.in.response.CrewCreateResponse;
-import com.retrip.crew.application.in.response.CrewDetailResponse;
-import com.retrip.crew.application.in.response.CrewListResponse;
 import com.retrip.crew.application.in.usecase.CreateCrewUseCase;
-import com.retrip.crew.application.in.usecase.GetCrewUseCase;
-import com.retrip.crew.application.out.repository.CrewMemberRepository;
-import com.retrip.crew.application.out.repository.CrewQueryRepository;
 import com.retrip.crew.application.out.repository.CrewRepository;
 import com.retrip.crew.domain.entity.Crew;
-import com.retrip.crew.domain.exception.CrewNotFoundException;
-import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
-import com.retrip.crew.infra.util.PaginationUtils;
-import java.util.UUID;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class CrewService implements CreateCrewUseCase, GetCrewUseCase {
+public class CrewService implements CreateCrewUseCase, UpdateRecruitmentUseCase, GetCrewUseCase {
     private final CrewRepository crewRepository;
     private final CrewMemberRepository crewMemberRepository;
     private final CrewQueryRepository crewQueryRepository;
@@ -34,6 +22,25 @@ public class CrewService implements CreateCrewUseCase, GetCrewUseCase {
         Crew crew = crewRepository.save(request.to(request.leader()));
 
         return CrewCreateResponse.of(crew);
+    }
+
+    @Override
+    public ChangeRecruitmentStatusResponse startRecruitment(UUID crewId) {
+        Crew crew = findById(crewId);
+        crew.startRecruitment();
+        return ChangeRecruitmentStatusResponse.of(crew);
+    }
+
+    @Override
+    public ChangeRecruitmentStatusResponse stopRecruitment(UUID crewId) {
+        Crew crew = findById(crewId);
+        crew.stopRecruitment();
+        return ChangeRecruitmentStatusResponse.of(crew);
+    }
+
+    private Crew findById(UUID crewId){
+        return crewRepository.findById(crewId)
+                .orElseThrow(CrewNotFoundException::new);
     }
 
     @Override

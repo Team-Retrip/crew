@@ -15,7 +15,6 @@ import java.util.UUID;
 public class Crew extends BaseEntity {
     @Id
     @Column(columnDefinition = "varbinary(16)")
-    @Getter
     private UUID id;
 
     @Version
@@ -25,13 +24,10 @@ public class Crew extends BaseEntity {
     private CrewTitle title;
 
     @Embedded
-    @Getter
     private CrewDescription description;
-
 
     @Embedded
     private CrewMembers crewMembers;
-
 
     @Embedded
     private Posts posts;
@@ -62,6 +58,14 @@ public class Crew extends BaseEntity {
 
     public CrewMember getLeader() {
         return crewMembers.getLeader();
+    }
+
+    public void startRecruitment() {
+        this.recruitment.start();
+    }
+
+    public void stopRecruitment() {
+        this.recruitment.stop();
     }
 
     public String getDescription(){
