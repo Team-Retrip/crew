@@ -1,10 +1,12 @@
 package com.retrip.crew.application.in;
 
 import com.retrip.crew.application.in.request.CrewCreateRequest;
+import com.retrip.crew.application.in.request.CrewUpdateRequest;
 import com.retrip.crew.application.in.response.CrewCreateResponse;
+import com.retrip.crew.application.in.response.CrewUpdateResponse;
 import com.retrip.crew.application.out.repository.CrewRepository;
+import com.retrip.crew.domain.entity.Crew;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -13,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class CrewServiceTest extends BaseTest {
     @Autowired
@@ -20,6 +23,11 @@ class CrewServiceTest extends BaseTest {
 
     CrewService crewService;
     UUID memberId = UUID.randomUUID();
+
+    @BeforeEach
+    void setUp() {
+        crewService = new CrewService(crewRepository);
+    }
 
     @Test
     void 크루를_생성_한다() {
@@ -62,6 +70,43 @@ class CrewServiceTest extends BaseTest {
                 () -> assertThat(response.title()).isEqualTo("강릉 크루원 구함"),
                 () -> assertThat(response.maxMembers()).isEqualTo(200)
         );
+    }
+
+    @Test
+    void 크루_참여_요청을_생성한다() {
+        Crew crew = crewRepository.save(Crew.create(
+                "속초 크루원 구함",
+                "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
+                100,
+                memberId
+        ));
+        CreateDemandRequest request = new CreateDemandRequest(memberId);
+
+        CreateDemandResponse response = crewService.createDemand(crew.getId(), request);
+
+        List<Demand> demands = crew.getRecruitment().getDemands();
+        assertAll(
+                () -> assertThat(demands.size()).isEqualTo(1),
+                () -> assertThat(response.memberId()).isEqualTo(demands.get(0).getMemberId())
+        );
+    }
+
+    @Test
+    void 이미_요청한_사용자는_다시_크루에_요청할_수_없다() {
+        Crew crew = Crew.create(
+                "속초 크루원 구함",
+                "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
+                100,
+                memberId
+        );
+        crew.demand(memberId);
+        crew.demand(UUID.randomUUID());
+        crew.demand(UUID.randomUUID());
+        Crew save = crewRepository.save(crew);
+        CreateDemandRequest request = new CreateDemandRequest(memberId);
+
+        assertThatThrownBy(() -> crewService.createDemand(save.getId(), request))
+                .isExactlyInstanceOf(IllegalStateException.class);
     }
 
     @Test

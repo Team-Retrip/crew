@@ -1,13 +1,18 @@
 package com.retrip.crew.application.in;
 
 import com.retrip.crew.application.in.request.CrewCreateRequest;
+import com.retrip.crew.application.in.request.CrewUpdateRequest;
 import com.retrip.crew.application.in.response.ChangeRecruitmentStatusResponse;
 import com.retrip.crew.application.in.response.CrewCreateResponse;
-import com.retrip.crew.application.in.usecase.CreateCrewUseCase;
+import com.retrip.crew.application.in.response.CrewUpdateResponse;
+import com.retrip.crew.application.in.usecase.ManageCrewUseCase;
 import com.retrip.crew.application.in.usecase.UpdateRecruitmentUseCase;
 import com.retrip.crew.application.out.repository.CrewRepository;
 import com.retrip.crew.domain.entity.Crew;
+import com.retrip.crew.domain.entity.Recruitment;
 import com.retrip.crew.domain.exception.CrewNotFoundException;
+import com.retrip.crew.domain.vo.CrewDescription;
+import com.retrip.crew.domain.vo.CrewTitle;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,7 +22,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase, GetCrewUseCase {
+public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase, ManageDemandUseCase, GetCrewUseCase {
     private final CrewRepository crewRepository;
     private final CrewMemberRepository crewMemberRepository;
     private final CrewQueryRepository crewQueryRepository;
@@ -53,6 +58,13 @@ public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase,
         Crew crew = findById(crewId);
         crew.stopRecruitment();
         return ChangeRecruitmentStatusResponse.of(crew);
+    }
+
+    @Override
+    public CreateDemandResponse createDemand(UUID crewId, CreateDemandRequest request) {
+        Crew crew = findById(crewId);
+        Demand demand = crew.demand(request.memberId());
+        return CreateDemandResponse.of(crew.getId(), demand);
     }
 
     private Crew findById(UUID crewId){

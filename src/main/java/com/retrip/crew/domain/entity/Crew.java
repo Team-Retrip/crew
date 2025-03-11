@@ -74,6 +74,10 @@ public class Crew extends BaseEntity {
         this.description = description;
     }
 
+    public Demand demand(UUID memberId) {
+        return recruitment.addDemand(memberId, this);
+    }
+
     public String getDescription(){
         return description.getValue();
     }

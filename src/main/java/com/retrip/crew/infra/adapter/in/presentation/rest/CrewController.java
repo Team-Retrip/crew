@@ -1,9 +1,11 @@
 package com.retrip.crew.infra.adapter.in.presentation.rest;
 
 import com.retrip.crew.application.in.request.CrewCreateRequest;
+import com.retrip.crew.application.in.request.CrewUpdateRequest;
 import com.retrip.crew.application.in.response.CrewCreateResponse;
 import com.retrip.crew.application.in.response.ChangeRecruitmentStatusResponse;
-import com.retrip.crew.application.in.usecase.CreateCrewUseCase;
+import com.retrip.crew.application.in.response.CrewUpdateResponse;
+import com.retrip.crew.application.in.usecase.ManageCrewUseCase;
 import com.retrip.crew.application.in.usecase.UpdateRecruitmentUseCase;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,6 +22,7 @@ import java.util.UUID;
 public class CrewController {
     private final ManageCrewUseCase manageCrewUseCase;
     private final UpdateRecruitmentUseCase updateRecruitmentUseCase;
+    private ManageDemandUseCase manageDemandUseCase;
     private final GetCrewUseCase getCrewUseCase;
 
     @PostMapping
@@ -49,6 +52,15 @@ public class CrewController {
     public ApiResponse<ChangeRecruitmentStatusResponse> stopRecruitment(@PathVariable final UUID crewId) {
         ChangeRecruitmentStatusResponse recruitment = updateRecruitmentUseCase.stopRecruitment(crewId);
         return ApiResponse.ok(recruitment);
+    }
+
+    @PostMapping("/{crewId}/demands")
+    @Schema(description = "크루 참여 요청")
+    public ApiResponse<CreateDemandResponse> createDemand(
+            @PathVariable final UUID crewId,
+            @RequestBody CreateDemandRequest request) {
+        CreateDemandResponse demand = manageDemandUseCase.createDemand(crewId, request);
+        return ApiResponse.created(demand);
     }
 
     @GetMapping

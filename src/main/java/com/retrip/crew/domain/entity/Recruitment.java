@@ -2,15 +2,19 @@ package com.retrip.crew.domain.entity;
 
 import com.retrip.crew.domain.exception.common.IllegalStateException;
 import com.retrip.crew.domain.vo.RecruitmentStatus;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-import static com.retrip.crew.domain.vo.RecruitmentStatus.*;
+import static com.retrip.crew.domain.vo.RecruitmentStatus.RECRUITING;
+import static com.retrip.crew.domain.vo.RecruitmentStatus.STOPPED;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
@@ -20,7 +24,7 @@ public class Recruitment {
     private RecruitmentStatus status;
 
     @OneToMany(mappedBy = "crew", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Subscription> subscriptions = new ArrayList<>();
+    private List<Demand> demands = new ArrayList<>();
 
     public Recruitment(int maxMembers) {
         this.maxMembers = maxMembers;
@@ -45,5 +49,20 @@ public class Recruitment {
 
     public void updateMaxMembers(int maxMembers) {
         this.maxMembers = maxMembers;
+    }
+
+    public Demand addDemand(UUID memberId, Crew crew) {
+        if (isDuplicate(memberId)) {
+            throw new IllegalStateException("이미 요청한 사용자는 다시 요청할 수 없습니다.");
+        }
+        Demand demand = new Demand(memberId, crew);
+        demands.add(demand);
+        return demand;
+    }
+
+    private boolean isDuplicate(UUID memberId) {
+        return demands.stream()
+                .map(Demand::getMemberId)
+                .anyMatch(id -> id.equals(memberId));
     }
 }
