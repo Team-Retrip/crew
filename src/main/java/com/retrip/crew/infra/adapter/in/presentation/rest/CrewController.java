@@ -1,11 +1,14 @@
 package com.retrip.crew.infra.adapter.in.presentation.rest;
 
+import com.retrip.crew.application.in.request.CreateDemandRequest;
 import com.retrip.crew.application.in.request.CrewCreateRequest;
 import com.retrip.crew.application.in.request.CrewUpdateRequest;
+import com.retrip.crew.application.in.response.CreateDemandResponse;
 import com.retrip.crew.application.in.response.CrewCreateResponse;
 import com.retrip.crew.application.in.response.ChangeRecruitmentStatusResponse;
 import com.retrip.crew.application.in.response.CrewUpdateResponse;
 import com.retrip.crew.application.in.usecase.ManageCrewUseCase;
+import com.retrip.crew.application.in.usecase.ManageDemandUseCase;
 import com.retrip.crew.application.in.usecase.UpdateRecruitmentUseCase;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,7 +25,7 @@ import java.util.UUID;
 public class CrewController {
     private final ManageCrewUseCase manageCrewUseCase;
     private final UpdateRecruitmentUseCase updateRecruitmentUseCase;
-    private ManageDemandUseCase manageDemandUseCase;
+    private final ManageDemandUseCase manageDemandUseCase;
     private final GetCrewUseCase getCrewUseCase;
 
     @PostMapping
