@@ -1,25 +1,25 @@
 package com.retrip.crew.application.in;
 
 import com.retrip.crew.application.in.request.CrewCreateRequest;
-import com.retrip.crew.application.in.request.CrewOrder;
 import com.retrip.crew.application.in.response.CrewCreateResponse;
-import com.retrip.crew.application.in.response.CrewDetailResponse;
-import com.retrip.crew.application.in.response.CrewListResponse;
-import com.retrip.crew.common.BaseTest;
-import com.retrip.crew.domain.entity.CrewMemberRole;
-import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
-import java.util.List;
-import java.util.UUID;
+import com.retrip.crew.application.out.repository.CrewRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import static com.retrip.crew.common.fixture.CrewFixture.createCrew;
-import static com.retrip.crew.common.fixture.CrewFixture.createMultipleCrews;
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 class CrewServiceTest extends BaseTest {
+    @Autowired
+    CrewRepository crewRepository;
+
+    CrewService crewService;
+    UUID memberId = UUID.randomUUID();
 
     @Test
     void 크루를_생성_한다() {
@@ -28,7 +28,7 @@ class CrewServiceTest extends BaseTest {
                 정수_ID,
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
-                5
+                100
         );
 
         //when
@@ -37,6 +37,31 @@ class CrewServiceTest extends BaseTest {
         //then
         assertThat(response.id()).isNotNull();
         assertThat(response.leaderId()).isNotNull();
+    }
+
+    @Test
+    void 크루의_제목_설명_최대_인원수를_수정한다() {
+        // given
+        Crew crew = crewRepository.save(Crew.create(
+                "속초 크루원 구함",
+                "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
+                100,
+                memberId
+        ));
+        CrewUpdateRequest request = new CrewUpdateRequest(
+                "강릉 크루원 구함",
+                "강릉 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
+                200
+        );
+
+        // when
+        CrewUpdateResponse response = crewService.updateCrew(crew.getId(), request);
+
+        // then
+        assertAll(
+                () -> assertThat(response.title()).isEqualTo("강릉 크루원 구함"),
+                () -> assertThat(response.maxMembers()).isEqualTo(200)
+        );
     }
 
     @Test

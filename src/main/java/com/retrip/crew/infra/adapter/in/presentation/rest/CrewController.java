@@ -2,29 +2,39 @@ package com.retrip.crew.infra.adapter.in.presentation.rest;
 
 import com.retrip.crew.application.in.request.CrewCreateRequest;
 import com.retrip.crew.application.in.response.CrewCreateResponse;
+import com.retrip.crew.application.in.response.ChangeRecruitmentStatusResponse;
 import com.retrip.crew.application.in.usecase.CreateCrewUseCase;
+import com.retrip.crew.application.in.usecase.UpdateRecruitmentUseCase;
+import com.retrip.crew.infra.adapter.in.presentation.rest.common.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RequestMapping("/crews")
 @RestController
 @Tag(name = "Crew", description = "크루 서비스")
 public class CrewController {
-    private final CreateCrewUseCase createCrewUseCase;
+    private final ManageCrewUseCase manageCrewUseCase;
     private final UpdateRecruitmentUseCase updateRecruitmentUseCase;
     private final GetCrewUseCase getCrewUseCase;
 
     @PostMapping
     @Schema(description = "크루 생성")
     public ApiResponse<CrewCreateResponse> createCrew(@RequestBody CrewCreateRequest request) {
-        CrewCreateResponse crew = createCrewUseCase.createCrew(request);
+        CrewCreateResponse crew = manageCrewUseCase.createCrew(request);
         return ApiResponse.created(crew);
+    }
+
+    @PutMapping("/{crewId}")
+    @Schema(description = "크루 정보 수정")
+    public ApiResponse<CrewUpdateResponse> updateCrew(
+            @PathVariable UUID crewId, @RequestBody CrewUpdateRequest request) {
+        CrewUpdateResponse crew = manageCrewUseCase.updateCrew(crewId, request);
+        return ApiResponse.ok(crew);
     }
 
     @PutMapping("/{crewId}/recruitments/start")

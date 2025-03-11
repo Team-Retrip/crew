@@ -6,8 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.UUID;
 
-@Schema(description = "크루 생성 Response")
-public record CrewCreateResponse(
+public record CrewUpdateResponse(
         @Schema(description = "크루 ID")
         UUID id,
 
@@ -25,14 +24,12 @@ public record CrewCreateResponse(
 
         @Schema(description = "모집 상태")
         RecruitmentStatus status
-
-
 ) {
-    public static CrewCreateResponse of(Crew crew) {
-        return new CrewCreateResponse(
+    public static CrewUpdateResponse of(Crew crew) {
+        return new CrewUpdateResponse(
                 crew.getId(),
                 crew.getTitle().getValue(),
-                crew.getDescription(),
+                crew.getDescription().getValue(),
                 crew.getLeader().getId(),
                 crew.getRecruitment().getMaxMembers(),
                 crew.getRecruitment().getStatus()

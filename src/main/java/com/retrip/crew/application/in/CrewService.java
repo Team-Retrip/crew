@@ -1,18 +1,23 @@
 package com.retrip.crew.application.in;
 
 import com.retrip.crew.application.in.request.CrewCreateRequest;
+import com.retrip.crew.application.in.response.ChangeRecruitmentStatusResponse;
 import com.retrip.crew.application.in.response.CrewCreateResponse;
 import com.retrip.crew.application.in.usecase.CreateCrewUseCase;
+import com.retrip.crew.application.in.usecase.UpdateRecruitmentUseCase;
 import com.retrip.crew.application.out.repository.CrewRepository;
 import com.retrip.crew.domain.entity.Crew;
+import com.retrip.crew.domain.exception.CrewNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class CrewService implements CreateCrewUseCase, UpdateRecruitmentUseCase, GetCrewUseCase {
+public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase, GetCrewUseCase {
     private final CrewRepository crewRepository;
     private final CrewMemberRepository crewMemberRepository;
     private final CrewQueryRepository crewQueryRepository;
@@ -22,6 +27,18 @@ public class CrewService implements CreateCrewUseCase, UpdateRecruitmentUseCase,
         Crew crew = crewRepository.save(request.to(request.leader()));
 
         return CrewCreateResponse.of(crew);
+    }
+
+    @Override
+    public CrewUpdateResponse updateCrew(UUID crewId, CrewUpdateRequest request) {
+        Crew crew = findById(crewId);
+        CrewTitle title = new CrewTitle(request.title());
+        CrewDescription description = new CrewDescription(request.description());
+        Recruitment recruitment = crew.getRecruitment();
+
+        crew.update(title, description);
+        recruitment.updateMaxMembers(request.maxMembers());
+        return CrewUpdateResponse.of(crew);
     }
 
     @Override

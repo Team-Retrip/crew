@@ -69,6 +69,11 @@ public class Crew extends BaseEntity {
         this.recruitment.stop();
     }
 
+    public void update(CrewTitle title, CrewDescription description) {
+        this.title = title;
+        this.description = description;
+    }
+
     public String getDescription(){
         return description.getValue();
     }

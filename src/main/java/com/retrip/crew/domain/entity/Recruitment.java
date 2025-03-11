@@ -42,4 +42,8 @@ public class Recruitment {
     private boolean isRecruitmentComplete(int membersSize) {
         return this.maxMembers == membersSize;
     }
+
+    public void updateMaxMembers(int maxMembers) {
+        this.maxMembers = maxMembers;
+    }
 }
