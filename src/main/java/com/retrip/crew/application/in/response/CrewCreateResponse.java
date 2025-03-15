@@ -20,7 +20,7 @@ public record CrewCreateResponse(
         return new CrewCreateResponse(
                 crew.getId(),
                 crew.getTitle().getValue(),
-                crew.getDescription().getValue(),
+                crew.getDescription(),
                 crew.getLeader().getId()
         );
     }
