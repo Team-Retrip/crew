@@ -13,6 +13,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.retrip.crew.application.in.request.CrewOrder;
 import com.retrip.crew.application.in.response.CrewListResponse;
 import com.retrip.crew.application.out.repository.CrewQueryRepository;
 import com.retrip.crew.domain.entity.QCrewMember;
@@ -75,10 +76,11 @@ public class CrewQuerydslRepository implements CrewQueryRepository {
         if (!pageable.getSort().isEmpty()) {
             for (Sort.Order order : pageable.getSort()) {
                 Order direction = order.isAscending() ? Order.ASC : Order.DESC;
-                return switch (order.getProperty()) {
-                    case "createdAt" -> new OrderSpecifier<>(direction, crew.createdAt);
-                    default -> new OrderSpecifier<>(Order.ASC, crew.createdAt);
-                };
+                if (CrewOrder.DATE.getField().equals(order.getProperty())) {
+                    return new OrderSpecifier<>(direction, crew.createdAt);
+                } else {
+                    return new OrderSpecifier<>(Order.ASC, crew.createdAt);
+                }
             }
         }
         return new OrderSpecifier<>(Order.ASC, crew.createdAt);

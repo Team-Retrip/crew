@@ -36,6 +36,7 @@ public class CrewController {
     }
 
     @GetMapping
+    @Schema(description = "크루 리스트 조회")
     public ResponseEntity<ApiResponse<ScrollPageResponse<CrewListResponse>>> getCrews(
             @RequestParam(name = "keyword", required = false) String keyword,
             @RequestParam(name = "order", defaultValue = "DATE") CrewOrder order,
@@ -47,6 +48,7 @@ public class CrewController {
     }
 
     @GetMapping("/{crewId}")
+    @Schema(description = "크루 상세 조회")
     public ResponseEntity<ApiResponse<CrewDetailResponse>> getCrewDetail(
             @PathVariable("crewId") UUID crewId
     ) {

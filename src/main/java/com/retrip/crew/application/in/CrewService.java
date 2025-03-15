@@ -7,6 +7,7 @@ import com.retrip.crew.application.in.response.CrewDetailResponse;
 import com.retrip.crew.application.in.response.CrewListResponse;
 import com.retrip.crew.application.in.usecase.CreateCrewUseCase;
 import com.retrip.crew.application.in.usecase.GetCrewUseCase;
+import com.retrip.crew.application.out.repository.CrewMemberRepository;
 import com.retrip.crew.application.out.repository.CrewQueryRepository;
 import com.retrip.crew.application.out.repository.CrewRepository;
 import com.retrip.crew.domain.entity.Crew;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CrewService implements CreateCrewUseCase, GetCrewUseCase {
     private final CrewRepository crewRepository;
+    private final CrewMemberRepository crewMemberRepository;
     private final CrewQueryRepository crewQueryRepository;
 
     @Override
@@ -47,7 +49,7 @@ public class CrewService implements CreateCrewUseCase, GetCrewUseCase {
     @Transactional(readOnly = true)
     public CrewDetailResponse getCrewDetail(UUID crewId) {
         Crew crew = findById(crewId);
-        int memberCount = crewRepository.countById(crewId);
+        int memberCount = crewMemberRepository.countByCrewId(crewId);
         return CrewDetailResponse.of(crew, memberCount);
     }
 

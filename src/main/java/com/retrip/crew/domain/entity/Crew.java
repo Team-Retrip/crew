@@ -60,4 +60,8 @@ public class Crew extends BaseEntity {
         return crewMembers.getLeader();
     }
 
+    public String getDescription(){
+        return description.getValue();
+    }
+
 }
