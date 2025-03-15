@@ -1,4 +1,4 @@
-package com.retrip.crew.common.helper;
+package com.retrip.crew.common.fixture;
 
 import com.retrip.crew.application.in.request.CrewCreateRequest;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public abstract class CrewTestHelper {
+public abstract class CrewFixture {
 
     public static CrewCreateRequest createCrew(UUID memberId, String title, String description, int maxMembers) {
         return new CrewCreateRequest(

@@ -1,32 +1,31 @@
 package com.retrip.crew.common;
 
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-
 import com.retrip.crew.application.in.CrewService;
+import com.retrip.crew.application.out.repository.CrewMemberRepository;
 import com.retrip.crew.application.out.repository.CrewQueryRepository;
 import com.retrip.crew.application.out.repository.CrewRepository;
+import com.retrip.crew.common.config.QuerydslConfig;
 import java.util.UUID;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 
-@SpringBootTest
-@TestInstance(PER_CLASS)
+@DataJpaTest
+@Import(QuerydslConfig.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class BaseTest {
 
-    private DatabaseCleaner databaseCleaner;
     @Autowired
     protected CrewRepository crewRepository;
 
     @Autowired
-    protected CrewQueryRepository crewQueryRepository;
+    protected CrewMemberRepository crewMemberRepository;
 
     @Autowired
+    protected CrewQueryRepository crewQueryRepository;
+
     protected CrewService crewService;
 
     protected UUID 정수_ID = UUID.fromString("13c8ab91-76bc-4f70-93e9-89f1a65dc640");
@@ -35,13 +34,8 @@ public class BaseTest {
     protected UUID 지수_ID = UUID.fromString("de3b60d2-5672-464d-8769-bf5c9de5eaff");
     protected UUID 혁진_ID = UUID.fromString("42880aaf-4b97-4b0c-8a8a-72df4bb592f6");
 
-    @BeforeAll
-    void beforeAll(@Autowired JdbcTemplate jdbcTemplate) {
-        this.databaseCleaner = new DatabaseCleaner(jdbcTemplate);
-    }
-
     @BeforeEach
     void setUp() {
-        databaseCleaner.clean();
+        crewService = new CrewService(crewRepository, crewMemberRepository, crewQueryRepository);
     }
 }

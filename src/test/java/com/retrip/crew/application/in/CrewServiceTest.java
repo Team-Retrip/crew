@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import static com.retrip.crew.common.helper.CrewTestHelper.createCrew;
-import static com.retrip.crew.common.helper.CrewTestHelper.createMultipleCrews;
+import static com.retrip.crew.common.fixture.CrewFixture.createCrew;
+import static com.retrip.crew.common.fixture.CrewFixture.createMultipleCrews;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
