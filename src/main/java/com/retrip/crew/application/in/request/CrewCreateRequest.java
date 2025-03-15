@@ -3,7 +3,6 @@ package com.retrip.crew.application.in.request;
 import com.retrip.crew.domain.entity.Crew;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Size;
 
 import java.util.UUID;
