@@ -29,7 +29,7 @@ public record CrewUpdateResponse(
         return new CrewUpdateResponse(
                 crew.getId(),
                 crew.getTitle().getValue(),
-                crew.getDescription().getValue(),
+                crew.getDescription(),
                 crew.getLeader().getId(),
                 crew.getRecruitment().getMaxMembers(),
                 crew.getRecruitment().getStatus()

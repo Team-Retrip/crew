@@ -2,18 +2,21 @@ package com.retrip.crew.infra.adapter.in.presentation.rest;
 
 import com.retrip.crew.application.in.request.CreateDemandRequest;
 import com.retrip.crew.application.in.request.CrewCreateRequest;
+import com.retrip.crew.application.in.request.CrewOrder;
 import com.retrip.crew.application.in.request.CrewUpdateRequest;
-import com.retrip.crew.application.in.response.CreateDemandResponse;
-import com.retrip.crew.application.in.response.CrewCreateResponse;
-import com.retrip.crew.application.in.response.ChangeRecruitmentStatusResponse;
-import com.retrip.crew.application.in.response.CrewUpdateResponse;
+import com.retrip.crew.application.in.response.*;
+import com.retrip.crew.application.in.usecase.GetCrewUseCase;
 import com.retrip.crew.application.in.usecase.ManageCrewUseCase;
 import com.retrip.crew.application.in.usecase.ManageDemandUseCase;
 import com.retrip.crew.application.in.usecase.UpdateRecruitmentUseCase;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ApiResponse;
+import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;

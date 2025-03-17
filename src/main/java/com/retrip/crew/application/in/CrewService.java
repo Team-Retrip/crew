@@ -1,21 +1,30 @@
 package com.retrip.crew.application.in;
 
+import com.retrip.crew.application.in.request.CreateDemandRequest;
 import com.retrip.crew.application.in.request.CrewCreateRequest;
+import com.retrip.crew.application.in.request.CrewOrder;
 import com.retrip.crew.application.in.request.CrewUpdateRequest;
-import com.retrip.crew.application.in.response.ChangeRecruitmentStatusResponse;
-import com.retrip.crew.application.in.response.CrewCreateResponse;
-import com.retrip.crew.application.in.response.CrewUpdateResponse;
+import com.retrip.crew.application.in.response.*;
+import com.retrip.crew.application.in.usecase.GetCrewUseCase;
 import com.retrip.crew.application.in.usecase.ManageCrewUseCase;
+import com.retrip.crew.application.in.usecase.ManageDemandUseCase;
 import com.retrip.crew.application.in.usecase.UpdateRecruitmentUseCase;
+import com.retrip.crew.application.out.repository.CrewMemberRepository;
+import com.retrip.crew.application.out.repository.CrewQueryRepository;
 import com.retrip.crew.application.out.repository.CrewRepository;
 import com.retrip.crew.domain.entity.Crew;
+import com.retrip.crew.domain.entity.Demand;
 import com.retrip.crew.domain.entity.Recruitment;
 import com.retrip.crew.domain.exception.CrewNotFoundException;
 import com.retrip.crew.domain.vo.CrewDescription;
 import com.retrip.crew.domain.vo.CrewTitle;
-import jakarta.transaction.Transactional;
+import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
+import com.retrip.crew.infra.util.PaginationUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -30,7 +39,6 @@ public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase,
     @Override
     public CrewCreateResponse createCrew(CrewCreateRequest request) {
         Crew crew = crewRepository.save(request.to(request.leader()));
-
         return CrewCreateResponse.of(crew);
     }
 
@@ -65,11 +73,6 @@ public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase,
         Crew crew = findById(crewId);
         Demand demand = crew.demand(request.memberId());
         return CreateDemandResponse.of(crew.getId(), demand);
-    }
-
-    private Crew findById(UUID crewId){
-        return crewRepository.findById(crewId)
-                .orElseThrow(CrewNotFoundException::new);
     }
 
     @Override

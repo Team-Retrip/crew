@@ -1,39 +1,35 @@
 package com.retrip.crew.application.in;
 
+import com.retrip.crew.application.in.request.CreateDemandRequest;
 import com.retrip.crew.application.in.request.CrewCreateRequest;
+import com.retrip.crew.application.in.request.CrewOrder;
 import com.retrip.crew.application.in.request.CrewUpdateRequest;
-import com.retrip.crew.application.in.response.CrewCreateResponse;
-import com.retrip.crew.application.in.response.CrewUpdateResponse;
-import com.retrip.crew.application.out.repository.CrewRepository;
+import com.retrip.crew.application.in.response.*;
+import com.retrip.crew.common.ServiceTest;
 import com.retrip.crew.domain.entity.Crew;
-import org.junit.jupiter.api.BeforeEach;
+import com.retrip.crew.domain.entity.CrewMemberRole;
+import com.retrip.crew.domain.entity.Demand;
+import com.retrip.crew.domain.exception.common.IllegalStateException;
+import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.UUID;
 
+import static com.retrip.crew.common.fixture.CrewFixture.createCrewRequest;
+import static com.retrip.crew.common.fixture.CrewFixture.createMultipleCrews;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-class CrewServiceTest extends BaseTest {
-    @Autowired
-    CrewRepository crewRepository;
-
-    CrewService crewService;
-    UUID memberId = UUID.randomUUID();
-
-    @BeforeEach
-    void setUp() {
-        crewService = new CrewService(crewRepository);
-    }
-
+class CrewServiceTest extends ServiceTest {
     @Test
     void 크루를_생성_한다() {
         //given
-        CrewCreateRequest request = createCrew(
-                정수_ID,
+        CrewCreateRequest request = createCrewRequest(
+                MEMBER_ID,
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100
@@ -54,7 +50,7 @@ class CrewServiceTest extends BaseTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100,
-                memberId
+                MEMBER_ID
         ));
         CrewUpdateRequest request = new CrewUpdateRequest(
                 "강릉 크루원 구함",
@@ -78,9 +74,9 @@ class CrewServiceTest extends BaseTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100,
-                memberId
+                MEMBER_ID
         ));
-        CreateDemandRequest request = new CreateDemandRequest(memberId);
+        CreateDemandRequest request = new CreateDemandRequest(MEMBER_ID);
 
         CreateDemandResponse response = crewService.createDemand(crew.getId(), request);
 
@@ -97,13 +93,13 @@ class CrewServiceTest extends BaseTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100,
-                memberId
+                MEMBER_ID
         );
-        crew.demand(memberId);
+        crew.demand(MEMBER_ID);
         crew.demand(UUID.randomUUID());
         crew.demand(UUID.randomUUID());
         Crew save = crewRepository.save(crew);
-        CreateDemandRequest request = new CreateDemandRequest(memberId);
+        CreateDemandRequest request = new CreateDemandRequest(MEMBER_ID);
 
         assertThatThrownBy(() -> crewService.createDemand(save.getId(), request))
                 .isExactlyInstanceOf(IllegalStateException.class);
@@ -114,7 +110,7 @@ class CrewServiceTest extends BaseTest {
         //given
         List<CrewCreateRequest> requests = createMultipleCrews(
                 10,
-                정수_ID,
+                MEMBER_ID,
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 5
@@ -142,8 +138,8 @@ class CrewServiceTest extends BaseTest {
     @Test
     void 크루_상세를_조회한다(){
         //given
-        CrewCreateRequest request = createCrew(
-                정수_ID,
+        CrewCreateRequest request = createCrewRequest(
+                MEMBER_ID,
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 5
@@ -156,10 +152,10 @@ class CrewServiceTest extends BaseTest {
         //then
         assertAll(
                 () -> assertThat(response.id()).isEqualTo(crewId),
-                () -> assertThat(response.leaderId()).isEqualTo(정수_ID),
+                () -> assertThat(response.leaderId()).isEqualTo(MEMBER_ID),
                 () -> assertThat(response.members().size()).isEqualTo(1),
                 () -> assertThat(response.members().getFirst().roleCode()).isEqualTo(CrewMemberRole.LEADER.getCode()),
-                () -> assertThat(response.members().getFirst().memberId()).isEqualTo(정수_ID)
+                () -> assertThat(response.members().getFirst().memberId()).isEqualTo(MEMBER_ID)
         );
     }
 }
