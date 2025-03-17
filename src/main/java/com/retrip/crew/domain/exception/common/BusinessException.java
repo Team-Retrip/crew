@@ -6,6 +6,11 @@ import lombok.Getter;
 public class BusinessException extends RuntimeException {
     private final ErrorCode errorCode;
 
+    public BusinessException() {
+        super(ErrorCode.SERVER_ERROR.getMessage());
+        this.errorCode = ErrorCode.SERVER_ERROR;
+    }
+
     public BusinessException(ErrorCode errorCode) {
         super(errorCode.getMessage());
         this.errorCode = errorCode;

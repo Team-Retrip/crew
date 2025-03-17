@@ -10,12 +10,15 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 @Entity
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Crew extends BaseEntity {
     @Id
     @Column(columnDefinition = "varbinary(16)")
     private UUID id;
+
+    @Version
+    private long version;
 
     @Embedded
     private CrewTitle title;
@@ -26,9 +29,6 @@ public class Crew extends BaseEntity {
     @Embedded
     private CrewMembers crewMembers;
 
-    @Column(name = "max_members", nullable = false)
-    private int maxMembers;
-
     @Embedded
     private Posts posts;
 
@@ -38,14 +38,14 @@ public class Crew extends BaseEntity {
     @Embedded
     private Introductions introductions;
 
-    @Version
-    private long version;
+    @Embedded
+    private Recruitment recruitment;
 
     private Crew(String name, String description, int maxMembers, UUID leader) {
         this.id = UUID.randomUUID();
         this.title = new CrewTitle(name);
         this.description = new CrewDescription(description);
-        this.maxMembers = maxMembers;
+        this.recruitment = new Recruitment(maxMembers);
         this.crewMembers = new CrewMembers(this, leader);
         this.posts = new Posts();
         this.announcements = new Announcements();
@@ -58,6 +58,24 @@ public class Crew extends BaseEntity {
 
     public CrewMember getLeader() {
         return crewMembers.getLeader();
+    }
+
+    public void startRecruitment() {
+        int membersSize = crewMembers.getSize();
+        this.recruitment.start(membersSize);
+    }
+
+    public void stopRecruitment() {
+        this.recruitment.stop();
+    }
+
+    public void update(CrewTitle title, CrewDescription description) {
+        this.title = title;
+        this.description = description;
+    }
+
+    public Demand demand(UUID memberId) {
+        return recruitment.addDemand(memberId, this);
     }
 
     public String getDescription(){

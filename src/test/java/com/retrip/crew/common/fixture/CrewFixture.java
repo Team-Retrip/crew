@@ -8,7 +8,7 @@ import java.util.stream.IntStream;
 
 public abstract class CrewFixture {
 
-    public static CrewCreateRequest createCrew(UUID memberId, String title, String description, int maxMembers) {
+    public static CrewCreateRequest createCrewRequest(UUID memberId, String title, String description, int maxMembers) {
         return new CrewCreateRequest(
                 memberId,
                 title,
@@ -22,7 +22,7 @@ public abstract class CrewFixture {
                 .mapToObj(i -> {
                     String title = baseTitle + " " + (i + 1);
                     String description = baseDescription + " " + (i + 1);
-                    return createCrew(memberId, title, description, maxMembers);
+                    return createCrewRequest(memberId, title, description, maxMembers);
                 })
                 .collect(Collectors.toList());
     }

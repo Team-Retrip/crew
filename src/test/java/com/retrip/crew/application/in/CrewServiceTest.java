@@ -1,34 +1,38 @@
 package com.retrip.crew.application.in;
 
+import com.retrip.crew.application.in.request.CreateDemandRequest;
 import com.retrip.crew.application.in.request.CrewCreateRequest;
 import com.retrip.crew.application.in.request.CrewOrder;
-import com.retrip.crew.application.in.response.CrewCreateResponse;
-import com.retrip.crew.application.in.response.CrewDetailResponse;
-import com.retrip.crew.application.in.response.CrewListResponse;
-import com.retrip.crew.common.BaseTest;
+import com.retrip.crew.application.in.request.CrewUpdateRequest;
+import com.retrip.crew.application.in.response.*;
+import com.retrip.crew.common.ServiceTest;
+import com.retrip.crew.domain.entity.Crew;
 import com.retrip.crew.domain.entity.CrewMemberRole;
+import com.retrip.crew.domain.entity.Demand;
+import com.retrip.crew.domain.exception.common.IllegalStateException;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
-import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import static com.retrip.crew.common.fixture.CrewFixture.createCrew;
+import java.util.List;
+import java.util.UUID;
+
+import static com.retrip.crew.common.fixture.CrewFixture.createCrewRequest;
 import static com.retrip.crew.common.fixture.CrewFixture.createMultipleCrews;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-class CrewServiceTest extends BaseTest {
-
+class CrewServiceTest extends ServiceTest {
     @Test
     void 크루를_생성_한다() {
         //given
-        CrewCreateRequest request = createCrew(
-                정수_ID,
+        CrewCreateRequest request = createCrewRequest(
+                MEMBER_ID,
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
-                5
+                100
         );
 
         //when
@@ -40,11 +44,73 @@ class CrewServiceTest extends BaseTest {
     }
 
     @Test
+    void 크루의_제목_설명_최대_인원수를_수정한다() {
+        // given
+        Crew crew = crewRepository.save(Crew.create(
+                "속초 크루원 구함",
+                "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
+                100,
+                MEMBER_ID
+        ));
+        CrewUpdateRequest request = new CrewUpdateRequest(
+                "강릉 크루원 구함",
+                "강릉 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
+                200
+        );
+
+        // when
+        CrewUpdateResponse response = crewService.updateCrew(crew.getId(), request);
+
+        // then
+        assertAll(
+                () -> assertThat(response.title()).isEqualTo("강릉 크루원 구함"),
+                () -> assertThat(response.maxMembers()).isEqualTo(200)
+        );
+    }
+
+    @Test
+    void 크루_참여_요청을_생성한다() {
+        Crew crew = crewRepository.save(Crew.create(
+                "속초 크루원 구함",
+                "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
+                100,
+                MEMBER_ID
+        ));
+        CreateDemandRequest request = new CreateDemandRequest(MEMBER_ID);
+
+        CreateDemandResponse response = crewService.createDemand(crew.getId(), request);
+
+        List<Demand> demands = crew.getRecruitment().getDemands();
+        assertAll(
+                () -> assertThat(demands.size()).isEqualTo(1),
+                () -> assertThat(response.memberId()).isEqualTo(demands.get(0).getMemberId())
+        );
+    }
+
+    @Test
+    void 이미_요청한_사용자는_다시_크루에_요청할_수_없다() {
+        Crew crew = Crew.create(
+                "속초 크루원 구함",
+                "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
+                100,
+                MEMBER_ID
+        );
+        crew.demand(MEMBER_ID);
+        crew.demand(UUID.randomUUID());
+        crew.demand(UUID.randomUUID());
+        Crew save = crewRepository.save(crew);
+        CreateDemandRequest request = new CreateDemandRequest(MEMBER_ID);
+
+        assertThatThrownBy(() -> crewService.createDemand(save.getId(), request))
+                .isExactlyInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
     void 크루를_검색_및_정렬_필터링하여_조회한다(){
         //given
         List<CrewCreateRequest> requests = createMultipleCrews(
                 10,
-                정수_ID,
+                MEMBER_ID,
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 5
@@ -72,8 +138,8 @@ class CrewServiceTest extends BaseTest {
     @Test
     void 크루_상세를_조회한다(){
         //given
-        CrewCreateRequest request = createCrew(
-                정수_ID,
+        CrewCreateRequest request = createCrewRequest(
+                MEMBER_ID,
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 5
@@ -86,10 +152,10 @@ class CrewServiceTest extends BaseTest {
         //then
         assertAll(
                 () -> assertThat(response.id()).isEqualTo(crewId),
-                () -> assertThat(response.leaderId()).isEqualTo(정수_ID),
+                () -> assertThat(response.leaderId()).isEqualTo(MEMBER_ID),
                 () -> assertThat(response.members().size()).isEqualTo(1),
                 () -> assertThat(response.members().getFirst().roleCode()).isEqualTo(CrewMemberRole.LEADER.getCode()),
-                () -> assertThat(response.members().getFirst().memberId()).isEqualTo(정수_ID)
+                () -> assertThat(response.members().getFirst().memberId()).isEqualTo(MEMBER_ID)
         );
     }
 }
