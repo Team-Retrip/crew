@@ -1,10 +1,5 @@
 package com.retrip.crew.infra.adapter.out.persistence.mysql.query;
 
-import static com.querydsl.jpa.JPAExpressions.select;
-import static com.retrip.crew.domain.entity.QCrew.crew;
-import static com.retrip.crew.domain.entity.QCrewMember.crewMember;
-import static com.retrip.crew.infra.util.PaginationUtils.checkEndPage;
-
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -17,12 +12,18 @@ import com.retrip.crew.application.in.request.CrewOrder;
 import com.retrip.crew.application.in.response.CrewListResponse;
 import com.retrip.crew.application.out.repository.CrewQueryRepository;
 import com.retrip.crew.domain.entity.QCrewMember;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+import static com.querydsl.jpa.JPAExpressions.select;
+import static com.retrip.crew.domain.entity.QCrew.crew;
+import static com.retrip.crew.domain.entity.QCrewMember.crewMember;
+import static com.retrip.crew.infra.util.PaginationUtils.checkEndPage;
 
 @Repository
 @RequiredArgsConstructor
@@ -43,7 +44,7 @@ public class CrewQuerydslRepository implements CrewQueryRepository {
                                         select(subCrewMember.count())
                                         .from(subCrewMember)
                                         .where(subCrewMember.crew.id.eq(crew.id)) ,MemberCountAlias),
-                                crew.maxMembers.as("maxMemberCount")
+                                crew.recruitment.maxMembers.as("maxMemberCount")
                         )
                 )
                 .from(crew)

@@ -27,6 +27,13 @@ public class CrewMembers {
     }
 
     public CrewMember getLeader() {
-        return this.values.stream().filter(it -> it.getCrewMemberRole() == CrewMemberRole.LEADER).findFirst().orElse(null);
+        return this.values.stream()
+                .filter(it -> it.getCrewMemberRole() == CrewMemberRole.LEADER)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public int getSize() {
+        return this.values.size();
     }
 }

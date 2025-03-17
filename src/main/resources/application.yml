@@ -19,6 +19,7 @@ spring:
 logging:
   level:
     org.hibernate.type.descriptor.sql: trace
+    org.hibernate.orm.jdbc.bind: TRACE
     org.springframework.web.client.RestTemplate: DEBUG
 
 springdoc:

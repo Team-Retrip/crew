@@ -11,6 +11,7 @@ public enum ErrorCode {
     INVALID_INPUT_VALUE(BAD_REQUEST, "Common-002", "Invalid input value"),
     HANDLE_ACCESS_DENIED(FORBIDDEN, "Common-003", "Access is denied"),
     ENTITY_NOT_FOUND(BAD_REQUEST, "Common-004", "Entity not found"),
+    ILLEGAL_STATE(BAD_REQUEST, "Common-005", "Illegal state"),
 
     CREW_NOT_FOUND(BAD_REQUEST, "Crew-001", "크루 엔티티를 찾을 수 없습니다.")
     ;

@@ -3,9 +3,10 @@ package com.retrip.crew.application.in.response;
 import com.retrip.crew.domain.entity.Crew;
 import com.retrip.crew.domain.entity.CrewMember;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
+
 import java.util.List;
 import java.util.UUID;
-import lombok.Builder;
 
 @Schema
 @Builder
@@ -39,7 +40,7 @@ public record CrewDetailResponse(
                 .description(crew.getDescription())
                 .leaderId(crew.getLeader().getMemberId())
                 .memberCount(memberCount)
-                .maxMemberCount(crew.getMaxMembers())
+                .maxMemberCount(crew.getRecruitment().getMaxMembers())
                 .members(toList(crew.getCrewMembers().getValues()))
                 .build();
     }
