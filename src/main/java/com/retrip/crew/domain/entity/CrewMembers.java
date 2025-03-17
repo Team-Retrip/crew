@@ -32,4 +32,8 @@ public class CrewMembers {
                 .findFirst()
                 .orElse(null);
     }
+
+    public int getSize() {
+        return this.values.size();
+    }
 }

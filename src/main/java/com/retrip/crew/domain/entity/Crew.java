@@ -61,7 +61,7 @@ public class Crew extends BaseEntity {
     }
 
     public void startRecruitment() {
-        int membersSize = crewMembers.getValues().size();
+        int membersSize = crewMembers.getSize();
         this.recruitment.start(membersSize);
     }
 
