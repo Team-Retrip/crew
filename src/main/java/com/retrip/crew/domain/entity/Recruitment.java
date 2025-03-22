@@ -3,6 +3,7 @@ package com.retrip.crew.domain.entity;
 import com.retrip.crew.domain.exception.common.IllegalStateException;
 import com.retrip.crew.domain.vo.RecruitmentStatus;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
@@ -21,6 +22,8 @@ import static com.retrip.crew.domain.vo.RecruitmentStatus.STOPPED;
 @Embeddable
 public class Recruitment {
     private int maxMembers;
+
+    @Column(name = "recruitment_status")
     private RecruitmentStatus status;
 
     @OneToMany(mappedBy = "crew", cascade = CascadeType.ALL, orphanRemoval = true)
