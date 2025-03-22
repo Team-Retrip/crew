@@ -44,7 +44,7 @@ public abstract class CrewFixture {
         return Crew.create(
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
-                5,
+                100,
                 leaderId);
     }
 

@@ -1,19 +1,19 @@
 package com.retrip.crew.application.in;
 
-import com.retrip.crew.application.in.request.CreateDemandRequest;
-import com.retrip.crew.application.in.request.CrewCreateRequest;
-import com.retrip.crew.application.in.request.CrewOrder;
-import com.retrip.crew.application.in.request.CrewUpdateRequest;
+import com.retrip.crew.application.in.request.*;
 import com.retrip.crew.application.in.response.*;
 import com.retrip.crew.common.ServiceTest;
 import com.retrip.crew.domain.entity.Crew;
 import com.retrip.crew.domain.entity.CrewMemberRole;
 import com.retrip.crew.domain.entity.Demand;
 import com.retrip.crew.domain.exception.common.IllegalStateException;
+import com.retrip.crew.domain.vo.DemandStatus;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 import java.util.UUID;
@@ -92,6 +92,31 @@ class CrewServiceTest extends ServiceTest {
         // when, then
         assertThatThrownBy(() -> crewService.createDemand(save.getId(), request))
                 .isExactlyInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void 리더가_크루_요청_대기_목록을_조회한다() {
+        // given
+        Crew crew = crewRepository.save(createCrew(LEADER_ID));
+        Demand 정수 = new Demand(정수_ID, crew);
+        Demand 홍석 = new Demand(홍석_ID, crew);
+        Demand 준호 = new Demand(준호_ID, crew);
+        Demand 지수 = new Demand(지수_ID, crew);
+        Demand 혁진 = new Demand(혁진_ID, crew);
+        List<Demand> demands = List.of(정수, 홍석, 준호, 지수, 혁진);
+
+        ReflectionTestUtils.setField(지수, "status", DemandStatus.APPROVED);
+        ReflectionTestUtils.setField(혁진, "status", DemandStatus.REJECTED);
+        ReflectionTestUtils.setField(crew.getRecruitment(), "demands", demands);
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // when
+        Page<PendingDemandsResponse> response =
+                crewService.getPendingDemands(crew.getId(), LEADER_ID, pageable, DemandOrder.DATE, "desc");
+
+        // then
+        assertThat(response.getTotalElements()).isEqualTo(3);
     }
 
     @Test

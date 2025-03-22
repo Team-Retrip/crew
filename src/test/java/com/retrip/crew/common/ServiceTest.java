@@ -1,6 +1,7 @@
 package com.retrip.crew.common;
 
 import com.retrip.crew.application.in.CrewService;
+import com.retrip.crew.application.out.repository.CrewDemandRepository;
 import com.retrip.crew.application.out.repository.CrewMemberRepository;
 import com.retrip.crew.application.out.repository.CrewQueryRepository;
 import com.retrip.crew.application.out.repository.CrewRepository;
@@ -25,10 +26,13 @@ public class ServiceTest {
     @Autowired
     protected CrewQueryRepository crewQueryRepository;
 
+    @Autowired
+    protected CrewDemandRepository demandRepository;
+
     protected CrewService crewService;
 
     @BeforeEach
     void setUp() {
-        crewService = new CrewService(crewRepository, crewMemberRepository, crewQueryRepository);
+        crewService = new CrewService(crewRepository, crewMemberRepository, crewQueryRepository, demandRepository);
     }
 }
