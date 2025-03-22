@@ -81,5 +81,4 @@ public class Crew extends BaseEntity {
     public String getDescription(){
         return description.getValue();
     }
-
 }

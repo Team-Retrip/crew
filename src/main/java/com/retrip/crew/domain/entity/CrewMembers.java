@@ -1,5 +1,6 @@
 package com.retrip.crew.domain.entity;
 
+import com.retrip.crew.domain.exception.common.InvalidValueException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.OneToMany;
@@ -35,5 +36,13 @@ public class CrewMembers {
 
     public int getSize() {
         return this.values.size();
+    }
+
+    public boolean isLeader(UUID memberId) {
+        return this.values.stream()
+                .filter(m -> memberId.equals(m.getMemberId()))
+                .findFirst()
+                .orElseThrow(() -> new InvalidValueException("크루 멤버가 아닙니다."))
+                .isLeader();
     }
 }

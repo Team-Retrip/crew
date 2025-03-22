@@ -11,8 +11,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-import java.util.UUID;
-
 @DataJpaTest
 @Import(QuerydslConfig.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -28,8 +26,6 @@ public class ServiceTest {
     protected CrewQueryRepository crewQueryRepository;
 
     protected CrewService crewService;
-
-    protected UUID MEMBER_ID = UUID.fromString("13c8ab91-76bc-4f70-93e9-89f1a65dc640");
 
     @BeforeEach
     void setUp() {
