@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.UUID;
 
+@Schema(description = "크루 모집 상태 변경 Response")
 public record ChangeRecruitmentStatusResponse(
         @Schema(description = "크루 ID")
         UUID id,
