@@ -67,16 +67,17 @@ public class CrewController {
         return ApiResponse.created(demand);
     }
 
-    @GetMapping("/{crewId}/demands/pending")
-    @Schema(description = "크루 참여 요청 대기 목록 조회")
-    public ApiResponse<Page<PendingDemandsResponse>> getDemands(
+    @GetMapping("/{crewId}/demands")
+    @Schema(description = "크루 참여 요청 목록 조회")
+    public ApiResponse<Page<DemandsResponse>> getDemands(
             @PathVariable final UUID crewId,
             @RequestParam final UUID memberId,
+            @RequestParam final String status,
             @PageableDefault(size = 10) Pageable pageable,
             @RequestParam(name = "order", defaultValue = "DATE") DemandOrder order,
             @RequestParam(name = "sort", defaultValue = "asc") String sort) {
-        Page<PendingDemandsResponse> demands =
-                manageDemandUseCase.getPendingDemands(crewId, memberId, pageable, order, sort);
+        Page<DemandsResponse> demands =
+                manageDemandUseCase.getDemands(crewId, memberId, status, pageable, order, sort);
         return ApiResponse.ok(demands);
     }
 

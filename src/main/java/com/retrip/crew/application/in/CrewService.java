@@ -79,13 +79,13 @@ public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase,
     }
 
     @Override
-    public Page<PendingDemandsResponse> getPendingDemands(
-            UUID crewId, UUID memberId, Pageable pageable, DemandOrder order, String sort) {
+    public Page<DemandsResponse> getDemands(
+            UUID crewId, UUID memberId, String status, Pageable pageable, DemandOrder order, String sort) {
         Crew crew = findById(crewId);
         throwIfNotLeader(crew, memberId, new NotCrewLeaderException());
         Page<Demand> demands = demandRepository.findByCrewIdAndStatus(
-                crewId, DemandStatus.PENDING, PaginationUtils.createPageRequest(pageable, order.getField(), sort));
-        return demands.map(d -> PendingDemandsResponse.of(crewId, d));
+                crewId, DemandStatus.valueOf(status), PaginationUtils.createPageRequest(pageable, order.getField(), sort));
+        return demands.map(d -> DemandsResponse.of(crewId, d));
     }
 
     private static void throwIfNotLeader(Crew crew, UUID memberId, BusinessException exception) {

@@ -10,6 +10,8 @@ import com.retrip.crew.domain.exception.common.IllegalStateException;
 import com.retrip.crew.domain.vo.DemandStatus;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -94,8 +96,9 @@ class CrewServiceTest extends ServiceTest {
                 .isExactlyInstanceOf(IllegalStateException.class);
     }
 
-    @Test
-    void 리더가_크루_요청_대기_목록을_조회한다() {
+    @ParameterizedTest
+    @CsvSource({"PENDING,2", "APPROVED,2", "REJECTED,1"})
+    void 리더가_크루_요청_목록을_조회한다(String status, int expected) {
         // given
         Crew crew = crewRepository.save(createCrew(LEADER_ID));
         Demand 정수 = new Demand(정수_ID, crew);
@@ -105,6 +108,7 @@ class CrewServiceTest extends ServiceTest {
         Demand 혁진 = new Demand(혁진_ID, crew);
         List<Demand> demands = List.of(정수, 홍석, 준호, 지수, 혁진);
 
+        ReflectionTestUtils.setField(준호, "status", DemandStatus.APPROVED);
         ReflectionTestUtils.setField(지수, "status", DemandStatus.APPROVED);
         ReflectionTestUtils.setField(혁진, "status", DemandStatus.REJECTED);
         ReflectionTestUtils.setField(crew.getRecruitment(), "demands", demands);
@@ -112,11 +116,11 @@ class CrewServiceTest extends ServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        Page<PendingDemandsResponse> response =
-                crewService.getPendingDemands(crew.getId(), LEADER_ID, pageable, DemandOrder.DATE, "desc");
+        Page<DemandsResponse> response =
+                crewService.getDemands(crew.getId(), LEADER_ID, status, pageable, DemandOrder.DATE, "desc");
 
         // then
-        assertThat(response.getTotalElements()).isEqualTo(3);
+        assertThat(response.getTotalElements()).isEqualTo(expected);
     }
 
     @Test

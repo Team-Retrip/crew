@@ -5,13 +5,13 @@ import com.retrip.crew.domain.vo.DemandStatus;
 
 import java.util.UUID;
 
-public record PendingDemandsResponse(
+public record DemandsResponse(
         UUID crewId,
         UUID demandId,
         UUID memberId,
         DemandStatus status
 ) {
-    public static PendingDemandsResponse of(UUID crewId, Demand demand) {
-        return new PendingDemandsResponse(crewId, demand.getId(), demand.getMemberId(), demand.getStatus());
+    public static DemandsResponse of(UUID crewId, Demand demand) {
+        return new DemandsResponse(crewId, demand.getId(), demand.getMemberId(), demand.getStatus());
     }
 }
