@@ -81,4 +81,8 @@ public class Crew extends BaseEntity {
     public String getDescription(){
         return description.getValue();
     }
+
+    public void cancelDemand(Demand demand) {
+        recruitment.cancelDemand(demand);
+    }
 }

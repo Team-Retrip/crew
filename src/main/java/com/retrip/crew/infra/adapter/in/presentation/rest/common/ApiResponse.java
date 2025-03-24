@@ -23,6 +23,10 @@ public class ApiResponse<T> {
         return success(data, OK);
     }
 
+    public static <T> ApiResponse<T> noContent() {
+        return success(null, NO_CONTENT);
+    }
+
     public static <T> ApiResponse<T> of(T data, HttpStatus status) {
         return success(data, status);
     }

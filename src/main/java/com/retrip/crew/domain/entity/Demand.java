@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+import static com.retrip.crew.domain.vo.DemandStatus.CANCELED;
 import static com.retrip.crew.domain.vo.DemandStatus.PENDING;
 
 @Entity
@@ -34,5 +35,13 @@ public class Demand extends BaseEntity {
         this.memberId = memberId;
         this.status = PENDING;
         this.crew = crew;
+    }
+
+    public boolean isNotPending() {
+        return this.status != PENDING;
+    }
+
+    public void cancel() {
+        this.status = CANCELED;
     }
 }

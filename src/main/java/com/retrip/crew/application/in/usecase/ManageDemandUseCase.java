@@ -18,4 +18,6 @@ public interface ManageDemandUseCase {
             UUID crewId, UUID memberId, String status, Pageable pageable, DemandOrder order, String sort);
 
     Page<CrewsOfDemandResponse> getCrewsOfDemand(UUID crewId, UUID demandId, UUID memberId, Pageable pageable, CrewOrder order, String sort);
+
+    void cancelDemand(UUID crewId, UUID demandId, UUID memberId);
 }

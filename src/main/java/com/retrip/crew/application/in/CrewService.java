@@ -94,7 +94,7 @@ public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase,
             UUID crewId, UUID demandId, UUID memberId, Pageable pageable, CrewOrder order, String sort) {
         Crew crew = findById(crewId);
         throwIfNotLeader(crew, memberId, new NotCrewLeaderException());
-        Demand demand = findDemandById(demandId);
+        Demand demand = findDemandByIdAndCrewId(demandId, crewId);
         return crewQueryRepository.findAllContainsMember(pageable, demand.getMemberId());
     }
 
@@ -104,8 +104,15 @@ public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase,
         }
     }
 
-    private Demand findDemandById(UUID demandId) {
-        return demandRepository.findById(demandId)
+    @Override
+    public void cancelDemand(UUID crewId, UUID demandId, UUID memberId) {
+        Crew crew = findById(crewId);
+        Demand demand = findDemandByIdAndCrewId(demandId, crewId);
+        crew.cancelDemand(demand);
+    }
+
+    private Demand findDemandByIdAndCrewId(UUID demandId, UUID crewId) {
+        return demandRepository.findByIdAndCrewId(demandId, crewId)
                 .orElseThrow(() -> new EntityNotFoundException("참여 요청 엔티티를 찾을 수 없습니다."));
     }
 

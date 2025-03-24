@@ -67,6 +67,16 @@ public class CrewController {
         return ApiResponse.created(demand);
     }
 
+    @PutMapping("/{crewId}/demands/{demandId}/cancel")
+    @Schema(description = "크루 참여 요청 취소")
+    public ApiResponse<Void> cancelDemand(
+            @PathVariable final UUID crewId,
+            @PathVariable final UUID demandId,
+            @RequestParam final UUID memberId) {
+        manageDemandUseCase.cancelDemand(crewId, demandId, memberId);
+        return ApiResponse.noContent();
+    }
+
     @GetMapping("/{crewId}/demands")
     @Schema(description = "크루 참여 요청 목록 조회")
     public ApiResponse<Page<DemandsResponse>> getDemands(

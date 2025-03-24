@@ -1,6 +1,7 @@
 package com.retrip.crew.domain.entity;
 
 import com.retrip.crew.domain.exception.common.IllegalStateException;
+import com.retrip.crew.domain.exception.common.InvalidValueException;
 import com.retrip.crew.domain.vo.RecruitmentStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -67,5 +68,20 @@ public class Recruitment {
         return demands.stream()
                 .map(Demand::getMemberId)
                 .anyMatch(id -> id.equals(memberId));
+    }
+
+    public void cancelDemand(Demand demand) {
+        Demand find = findDemand(demand);
+        if (find.isNotPending()) {
+            throw new IllegalStateException("참여 요청이 대기중이 아니면 취소할 수 없습니다.");
+        }
+        find.cancel();
+    }
+
+    private Demand findDemand(Demand demand) {
+        return demands.stream()
+                .filter(d -> d.equals(demand))
+                .findFirst()
+                .orElseThrow(() -> new InvalidValueException("참여 요청을 찾을 수 없습니다."));
     }
 }
