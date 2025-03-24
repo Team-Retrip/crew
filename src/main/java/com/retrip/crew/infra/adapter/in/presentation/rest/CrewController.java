@@ -81,6 +81,20 @@ public class CrewController {
         return ApiResponse.ok(demands);
     }
 
+    @GetMapping("/{crewId}/demands/{demandId}/crews")
+    @Schema(description = "크루 참여 요청자가 속한 크루 목록 조회")
+    public ApiResponse<Page<CrewsOfDemandResponse>> getCrewsOfDemand(
+            @PathVariable final UUID crewId,
+            @PathVariable final UUID demandId,
+            @RequestParam final UUID memberId,
+            @PageableDefault(size = 10) Pageable pageable,
+            @RequestParam(name = "order", defaultValue = "DATE") CrewOrder order,
+            @RequestParam(name = "sort", defaultValue = "asc") String sort) {
+        Page<CrewsOfDemandResponse> demands =
+                manageDemandUseCase.getCrewsOfDemand(crewId, demandId, memberId, pageable, order, sort);
+        return ApiResponse.ok(demands);
+    }
+
     @GetMapping
     @Schema(description = "크루 리스트 조회")
     public ResponseEntity<ApiResponse<ScrollPageResponse<CrewListResponse>>> getCrews(

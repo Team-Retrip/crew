@@ -124,7 +124,30 @@ class CrewServiceTest extends ServiceTest {
     }
 
     @Test
-    void 크루를_검색_및_정렬_필터링하여_조회한다(){
+    void 참여_요청자가_속한_크루_목록을_조회한다() {
+        // given
+        Crew crew = createCrew(LEADER_ID);
+        Demand demand = new Demand(홍석_ID, crew);
+        ReflectionTestUtils.setField(crew.getRecruitment(), "demands", List.of(demand));
+
+        crewRepository.save(crew);
+        crewRepository.save(createCrewWithMembers(MEMBER_ID));
+        crewRepository.save(createCrewWithMembers(MEMBER_ID));
+        crewRepository.save(createCrewWithMembers(MEMBER_ID));
+        crewRepository.save(createCrewWithMembers(MEMBER_ID));
+        crewRepository.save(createCrewWithMembers(MEMBER_ID));
+        Pageable pageable = PageRequest.of(0, 10);
+
+        // when
+        Page<CrewsOfDemandResponse> response =
+                crewService.getCrewsOfDemand(crew.getId(), demand.getId(), LEADER_ID, pageable, CrewOrder.DATE, "desc");
+
+        // then
+        assertThat(response.getTotalElements()).isEqualTo(5);
+    }
+
+    @Test
+    void 크루를_검색_및_정렬_필터링하여_조회한다() {
         //given
         List<CrewCreateRequest> requests = createMultipleCrews(
                 10,
@@ -154,7 +177,7 @@ class CrewServiceTest extends ServiceTest {
     }
 
     @Test
-    void 크루_상세를_조회한다(){
+    void 크루_상세를_조회한다() {
         //given
         CrewCreateRequest request = createCrewRequest(
                 MEMBER_ID,

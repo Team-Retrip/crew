@@ -16,6 +16,7 @@ import com.retrip.crew.domain.entity.Recruitment;
 import com.retrip.crew.domain.exception.CrewNotFoundException;
 import com.retrip.crew.domain.exception.NotCrewLeaderException;
 import com.retrip.crew.domain.exception.common.BusinessException;
+import com.retrip.crew.domain.exception.common.EntityNotFoundException;
 import com.retrip.crew.domain.vo.CrewDescription;
 import com.retrip.crew.domain.vo.CrewTitle;
 import com.retrip.crew.domain.vo.DemandStatus;
@@ -88,10 +89,24 @@ public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase,
         return demands.map(d -> DemandsResponse.of(crewId, d));
     }
 
+    @Override
+    public Page<CrewsOfDemandResponse> getCrewsOfDemand(
+            UUID crewId, UUID demandId, UUID memberId, Pageable pageable, CrewOrder order, String sort) {
+        Crew crew = findById(crewId);
+        throwIfNotLeader(crew, memberId, new NotCrewLeaderException());
+        Demand demand = findDemandById(demandId);
+        return crewQueryRepository.findAllContainsMember(pageable, demand.getMemberId());
+    }
+
     private static void throwIfNotLeader(Crew crew, UUID memberId, BusinessException exception) {
         if (!crew.getCrewMembers().isLeader(memberId)) {
             throw exception;
         }
+    }
+
+    private Demand findDemandById(UUID demandId) {
+        return demandRepository.findById(demandId)
+                .orElseThrow(() -> new EntityNotFoundException("참여 요청 엔티티를 찾을 수 없습니다."));
     }
 
     @Override

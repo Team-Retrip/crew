@@ -1,8 +1,10 @@
 package com.retrip.crew.application.in.usecase;
 
 import com.retrip.crew.application.in.request.CreateDemandRequest;
+import com.retrip.crew.application.in.request.CrewOrder;
 import com.retrip.crew.application.in.request.DemandOrder;
 import com.retrip.crew.application.in.response.CreateDemandResponse;
+import com.retrip.crew.application.in.response.CrewsOfDemandResponse;
 import com.retrip.crew.application.in.response.DemandsResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,4 +16,6 @@ public interface ManageDemandUseCase {
 
     Page<DemandsResponse> getDemands(
             UUID crewId, UUID memberId, String status, Pageable pageable, DemandOrder order, String sort);
+
+    Page<CrewsOfDemandResponse> getCrewsOfDemand(UUID crewId, UUID demandId, UUID memberId, Pageable pageable, CrewOrder order, String sort);
 }
