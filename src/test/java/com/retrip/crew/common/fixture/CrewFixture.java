@@ -1,6 +1,6 @@
 package com.retrip.crew.common.fixture;
 
-import com.retrip.crew.application.in.request.CrewCreateRequest;
+import com.retrip.crew.application.in.request.crew.CrewCreateRequest;
 import com.retrip.crew.domain.entity.Crew;
 import com.retrip.crew.domain.entity.CrewMember;
 import com.retrip.crew.domain.entity.CrewMemberRole;

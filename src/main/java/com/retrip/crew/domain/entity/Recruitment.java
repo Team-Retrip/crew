@@ -78,6 +78,14 @@ public class Recruitment {
         find.cancel();
     }
 
+    public void rejectDemand(Demand demand) {
+        Demand find = findDemand(demand);
+        if (find.isNotPending()) {
+            throw new IllegalStateException("참여 요청이 대기중이 아니면 거절할 수 없습니다.");
+        }
+        find.reject();
+    }
+
     private Demand findDemand(Demand demand) {
         return demands.stream()
                 .filter(d -> d.equals(demand))

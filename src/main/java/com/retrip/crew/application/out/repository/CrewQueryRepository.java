@@ -1,7 +1,7 @@
 package com.retrip.crew.application.out.repository;
 
-import com.retrip.crew.application.in.response.CrewListResponse;
-import com.retrip.crew.application.in.response.CrewsOfDemandResponse;
+import com.retrip.crew.application.in.response.crew.CrewListResponse;
+import com.retrip.crew.application.in.response.demand.CrewsOfDemandResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;

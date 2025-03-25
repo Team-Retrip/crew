@@ -8,8 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-import static com.retrip.crew.domain.vo.DemandStatus.CANCELED;
-import static com.retrip.crew.domain.vo.DemandStatus.PENDING;
+import static com.retrip.crew.domain.vo.DemandStatus.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
@@ -43,5 +42,9 @@ public class Demand extends BaseEntity {
 
     public void cancel() {
         this.status = CANCELED;
+    }
+
+    public void reject() {
+        this.status = REJECTED;
     }
 }

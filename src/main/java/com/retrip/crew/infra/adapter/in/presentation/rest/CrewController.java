@@ -1,7 +1,15 @@
 package com.retrip.crew.infra.adapter.in.presentation.rest;
 
-import com.retrip.crew.application.in.request.*;
-import com.retrip.crew.application.in.response.*;
+import com.retrip.crew.application.in.request.crew.CrewCreateRequest;
+import com.retrip.crew.application.in.request.crew.CrewOrder;
+import com.retrip.crew.application.in.request.crew.CrewUpdateRequest;
+import com.retrip.crew.application.in.request.demand.CreateDemandRequest;
+import com.retrip.crew.application.in.request.demand.DemandOrder;
+import com.retrip.crew.application.in.response.crew.CrewCreateResponse;
+import com.retrip.crew.application.in.response.crew.CrewDetailResponse;
+import com.retrip.crew.application.in.response.crew.CrewListResponse;
+import com.retrip.crew.application.in.response.crew.CrewUpdateResponse;
+import com.retrip.crew.application.in.response.demand.*;
 import com.retrip.crew.application.in.usecase.GetCrewUseCase;
 import com.retrip.crew.application.in.usecase.ManageCrewUseCase;
 import com.retrip.crew.application.in.usecase.ManageDemandUseCase;
@@ -103,6 +111,16 @@ public class CrewController {
         Page<CrewsOfDemandResponse> demands =
                 manageDemandUseCase.getCrewsOfDemand(crewId, demandId, memberId, pageable, order, sort);
         return ApiResponse.ok(demands);
+    }
+
+    @PutMapping("/{crewId}/demands/{demandId}/reject")
+    @Schema(description = "크루 참여 요청 거절")
+    public ApiResponse<RejectDemandResponse> rejectDemand(
+            @PathVariable final UUID crewId,
+            @PathVariable final UUID demandId,
+            @RequestParam final UUID memberId) {
+        RejectDemandResponse demand = manageDemandUseCase.rejectDemand(crewId, demandId, memberId);
+        return ApiResponse.ok(demand);
     }
 
     @GetMapping

@@ -1,7 +1,15 @@
 package com.retrip.crew.application.in;
 
-import com.retrip.crew.application.in.request.*;
-import com.retrip.crew.application.in.response.*;
+import com.retrip.crew.application.in.request.crew.CrewCreateRequest;
+import com.retrip.crew.application.in.request.crew.CrewOrder;
+import com.retrip.crew.application.in.request.crew.CrewUpdateRequest;
+import com.retrip.crew.application.in.request.demand.CreateDemandRequest;
+import com.retrip.crew.application.in.request.demand.DemandOrder;
+import com.retrip.crew.application.in.response.crew.CrewCreateResponse;
+import com.retrip.crew.application.in.response.crew.CrewDetailResponse;
+import com.retrip.crew.application.in.response.crew.CrewListResponse;
+import com.retrip.crew.application.in.response.crew.CrewUpdateResponse;
+import com.retrip.crew.application.in.response.demand.*;
 import com.retrip.crew.application.in.usecase.GetCrewUseCase;
 import com.retrip.crew.application.in.usecase.ManageCrewUseCase;
 import com.retrip.crew.application.in.usecase.ManageDemandUseCase;
@@ -109,6 +117,14 @@ public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase,
         Crew crew = findById(crewId);
         Demand demand = findDemandByIdAndCrewId(demandId, crewId);
         crew.cancelDemand(demand);
+    }
+
+    @Override
+    public RejectDemandResponse rejectDemand(UUID crewId, UUID demandId, UUID memberId) {
+        Crew crew = findById(crewId);
+        Demand demand = findDemandByIdAndCrewId(demandId, crewId);
+        crew.rejectDemand(demand);
+        return RejectDemandResponse.of(demand);
     }
 
     private Demand findDemandByIdAndCrewId(UUID demandId, UUID crewId) {

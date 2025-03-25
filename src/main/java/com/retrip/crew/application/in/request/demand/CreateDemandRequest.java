@@ -1,4 +1,4 @@
-package com.retrip.crew.application.in.request;
+package com.retrip.crew.application.in.request.demand;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

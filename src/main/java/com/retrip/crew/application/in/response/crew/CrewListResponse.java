@@ -1,4 +1,4 @@
-package com.retrip.crew.application.in.response;
+package com.retrip.crew.application.in.response.crew;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.UUID;

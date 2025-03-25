@@ -1,4 +1,4 @@
-package com.retrip.crew.application.in.response;
+package com.retrip.crew.application.in.response.demand;
 
 import com.retrip.crew.domain.entity.Crew;
 import com.retrip.crew.domain.vo.RecruitmentStatus;
