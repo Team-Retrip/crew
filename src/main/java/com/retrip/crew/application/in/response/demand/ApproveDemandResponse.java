@@ -6,8 +6,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.UUID;
 
-@Schema(description = "크루 참여 요청 거절 Response")
-public record RejectDemandResponse(
+@Schema(description = "크루 참여 요청 승인 Response")
+public record ApproveDemandResponse(
         @Schema(description = "크루 ID")
         UUID crewId,
 
@@ -20,7 +20,7 @@ public record RejectDemandResponse(
         @Schema(description = "참여 요청 상태")
         DemandStatus status
 ) {
-    public static RejectDemandResponse of(Demand demand) {
-        return new RejectDemandResponse(demand.getCrew().getId(), demand.getId(), demand.getMemberId(), demand.getStatus());
+    public static ApproveDemandResponse of(Demand demand) {
+        return new ApproveDemandResponse(demand.getCrew().getId(), demand.getId(), demand.getMemberId(), demand.getStatus());
     }
 }

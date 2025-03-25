@@ -44,6 +44,10 @@ public class Demand extends BaseEntity {
         this.status = CANCELED;
     }
 
+    public void approve() {
+        this.status = APPROVED;
+    }
+
     public void reject() {
         this.status = REJECTED;
     }

@@ -113,6 +113,16 @@ public class CrewController {
         return ApiResponse.ok(demands);
     }
 
+    @PutMapping("/{crewId}/demands/{demandId}/approve")
+    @Schema(description = "크루 참여 요청 승인")
+    public ApiResponse<ApproveDemandResponse> approveDemand(
+            @PathVariable final UUID crewId,
+            @PathVariable final UUID demandId,
+            @RequestParam final UUID memberId) {
+        ApproveDemandResponse demand = manageDemandUseCase.approveDemand(crewId, demandId, memberId);
+        return ApiResponse.ok(demand);
+    }
+
     @PutMapping("/{crewId}/demands/{demandId}/reject")
     @Schema(description = "크루 참여 요청 거절")
     public ApiResponse<RejectDemandResponse> rejectDemand(

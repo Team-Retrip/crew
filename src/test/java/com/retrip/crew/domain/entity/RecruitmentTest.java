@@ -86,4 +86,19 @@ class RecruitmentTest {
         assertThatThrownBy(() -> recruitment.cancelDemand(demand))
                 .isExactlyInstanceOf(IllegalStateException.class);
     }
+
+    @Test
+    void 참여_요청을_승인한다() {
+        // given
+        Crew crew = createCrew(LEADER_ID);
+        Recruitment recruitment = new Recruitment(100);
+        Demand demand = new Demand(정수_ID, crew);
+        ReflectionTestUtils.setField(recruitment, "demands", List.of(demand));
+
+        // when
+        recruitment.approveDemand(demand);
+
+        // then
+        assertThat(demand.getStatus()).isEqualTo(DemandStatus.APPROVED);
+    }
 }

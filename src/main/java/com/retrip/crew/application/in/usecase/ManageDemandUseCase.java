@@ -3,10 +3,7 @@ package com.retrip.crew.application.in.usecase;
 import com.retrip.crew.application.in.request.demand.CreateDemandRequest;
 import com.retrip.crew.application.in.request.crew.CrewOrder;
 import com.retrip.crew.application.in.request.demand.DemandOrder;
-import com.retrip.crew.application.in.response.demand.CreateDemandResponse;
-import com.retrip.crew.application.in.response.demand.CrewsOfDemandResponse;
-import com.retrip.crew.application.in.response.demand.DemandsResponse;
-import com.retrip.crew.application.in.response.demand.RejectDemandResponse;
+import com.retrip.crew.application.in.response.demand.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -23,4 +20,6 @@ public interface ManageDemandUseCase {
     void cancelDemand(UUID crewId, UUID demandId, UUID memberId);
 
     RejectDemandResponse rejectDemand(UUID crewId, UUID demandId, UUID memberId);
+
+    ApproveDemandResponse approveDemand(UUID crewId, UUID demandId, UUID memberId);
 }

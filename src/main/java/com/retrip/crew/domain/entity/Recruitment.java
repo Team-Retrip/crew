@@ -88,18 +88,26 @@ public class Recruitment {
 
     public void cancelDemand(Demand demand) {
         Demand find = findDemand(demand);
-        if (find.isNotPending()) {
-            throw new IllegalStateException("참여 요청이 대기중이 아니면 취소할 수 없습니다.");
-        }
+        throwIfNotPending(find);
         find.cancel();
+    }
+
+    public void approveDemand(Demand demand) {
+        Demand find = findDemand(demand);
+        throwIfNotPending(find);
+        find.approve();
     }
 
     public void rejectDemand(Demand demand) {
         Demand find = findDemand(demand);
-        if (find.isNotPending()) {
-            throw new IllegalStateException("참여 요청이 대기중이 아니면 거절할 수 없습니다.");
-        }
+        throwIfNotPending(find);
         find.reject();
+    }
+
+    private static void throwIfNotPending(Demand find) {
+        if (find.isNotPending()) {
+            throw new IllegalStateException("참여 요청의 상태가 대기중이 아닙니다.");
+        }
     }
 
     private Demand findDemand(Demand demand) {
