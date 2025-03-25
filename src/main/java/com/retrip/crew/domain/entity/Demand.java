@@ -47,4 +47,16 @@ public class Demand extends BaseEntity {
     public void reject() {
         this.status = REJECTED;
     }
+
+    public boolean isCanceled() {
+        return this.status == CANCELED;
+    }
+
+    public boolean isEqualTo(UUID memberId) {
+        return this.memberId.equals(memberId);
+    }
+
+    public void restore() {
+        this.status = PENDING;
+    }
 }

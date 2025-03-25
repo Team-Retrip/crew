@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.retrip.crew.domain.vo.RecruitmentStatus.RECRUITING;
@@ -59,6 +60,11 @@ public class Recruitment {
         if (isDuplicate(memberId)) {
             throw new IllegalStateException("이미 요청한 사용자는 다시 요청할 수 없습니다.");
         }
+        Optional<Demand> reDemand = findReDemand(memberId);
+        if (reDemand.isPresent()) {
+            reDemand.get().restore();
+            return reDemand.get();
+        }
         Demand demand = new Demand(memberId, crew);
         demands.add(demand);
         return demand;
@@ -66,8 +72,18 @@ public class Recruitment {
 
     private boolean isDuplicate(UUID memberId) {
         return demands.stream()
-                .map(Demand::getMemberId)
-                .anyMatch(id -> id.equals(memberId));
+                .anyMatch(d -> d.isEqualTo(memberId) && !d.isCanceled());
+    }
+
+    private Optional<Demand> findReDemand(UUID memberId) {
+        return demands.stream()
+                .filter(d -> isReDemand(memberId, d))
+                .findFirst();
+    }
+
+    private static boolean isReDemand(UUID memberId, Demand demand) {
+        return demand.isEqualTo(memberId)
+                && demand.isCanceled();
     }
 
     public void cancelDemand(Demand demand) {
