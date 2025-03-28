@@ -4,6 +4,7 @@ import com.retrip.crew.domain.entity.Crew;
 import com.retrip.crew.domain.vo.RecruitmentStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.util.List;
 import java.util.UUID;
 
 @Schema(description = "크루 생성 Response")
@@ -24,7 +25,10 @@ public record CrewCreateResponse(
         int maxMembers,
 
         @Schema(description = "모집 상태")
-        RecruitmentStatus status
+        RecruitmentStatus status,
+
+        @Schema(description = "크루 참여 질문 리스트")
+        List<String> questions
 
 
 ) {
@@ -35,7 +39,8 @@ public record CrewCreateResponse(
                 crew.getDescription(),
                 crew.getLeader().getId(),
                 crew.getRecruitment().getMaxMembers(),
-                crew.getRecruitment().getStatus()
+                crew.getRecruitment().getStatus(),
+                crew.getQuestions()
         );
     }
 }

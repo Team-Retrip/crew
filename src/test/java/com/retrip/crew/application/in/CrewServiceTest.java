@@ -32,7 +32,9 @@ class CrewServiceTest extends ServiceTest {
                 MEMBER_ID,
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
-                100
+                100,
+                List.of("질문")
+
         );
 
         //when
@@ -50,7 +52,8 @@ class CrewServiceTest extends ServiceTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100,
-                MEMBER_ID
+                MEMBER_ID,
+                List.of("질문1","질문2")
         ));
         CrewUpdateRequest request = new CrewUpdateRequest(
                 "강릉 크루원 구함",
@@ -74,7 +77,8 @@ class CrewServiceTest extends ServiceTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100,
-                MEMBER_ID
+                MEMBER_ID,
+                List.of("질문1")
         ));
         CreateDemandRequest request = new CreateDemandRequest(MEMBER_ID);
 
@@ -93,7 +97,8 @@ class CrewServiceTest extends ServiceTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100,
-                MEMBER_ID
+                MEMBER_ID,
+                List.of("질문1")
         );
         crew.demand(MEMBER_ID);
         crew.demand(UUID.randomUUID());
@@ -113,7 +118,8 @@ class CrewServiceTest extends ServiceTest {
                 MEMBER_ID,
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
-                5
+                5,
+                List.of("질문1")
         );
         requests.forEach(request -> {
             CrewCreateResponse response = crewService.createCrew(request);
@@ -142,7 +148,8 @@ class CrewServiceTest extends ServiceTest {
                 MEMBER_ID,
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
-                5
+                5,
+                List.of("질문1")
         );
         UUID crewId = crewService.createCrew(request).id();
 
@@ -158,4 +165,7 @@ class CrewServiceTest extends ServiceTest {
                 () -> assertThat(response.members().getFirst().memberId()).isEqualTo(MEMBER_ID)
         );
     }
+
+
+
 }

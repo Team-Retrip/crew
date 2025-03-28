@@ -17,7 +17,9 @@ class CrewTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100,
-                UUID.randomUUID())
+                UUID.randomUUID(),
+                List.of("질문1"))
+
         ).doesNotThrowAnyException();
     }
 
@@ -28,7 +30,9 @@ class CrewTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100,
-                UUID.randomUUID());
+                UUID.randomUUID(),
+                List.of("질문1")
+                );
 
         // then
         assertThat(crew.getRecruitment().getStatus()).isEqualTo(RecruitmentStatus.RECRUITING);
@@ -41,7 +45,8 @@ class CrewTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100,
-                UUID.randomUUID());
+                UUID.randomUUID(),
+                List.of("질문1"));
 
         // when
         crew.stopRecruitment();
@@ -57,7 +62,8 @@ class CrewTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100,
-                UUID.randomUUID());
+                UUID.randomUUID(),
+                List.of("질문1"));
         crew.stopRecruitment();
 
         // when
@@ -74,7 +80,8 @@ class CrewTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 5,
-                UUID.randomUUID());
+                UUID.randomUUID(),
+                List.of("질문1"));
         List<CrewMember> crewMemberList = List.of(
                 new CrewMember(crew, UUID.randomUUID(), CrewMemberRole.LEADER),
                 new CrewMember(crew, UUID.randomUUID(), CrewMemberRole.PARTICIPANT),
