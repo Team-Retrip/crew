@@ -92,7 +92,7 @@ public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase,
         return CrewDetailResponse.of(crew, memberCount);
     }
 
-    private Crew findById(UUID crewId){
+    public Crew findById(UUID crewId){
         return crewRepository.findById(crewId)
                 .orElseThrow(CrewNotFoundException::new);
     }

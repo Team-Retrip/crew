@@ -1,0 +1,21 @@
+package com.retrip.crew.application.in.usecase;
+
+import com.retrip.crew.application.in.request.CreatePostRequest;
+import com.retrip.crew.application.in.request.UpdatePostRequest;
+import com.retrip.crew.application.in.response.CreatePostResponse;
+
+import com.retrip.crew.application.in.response.DeletePostResponse;
+
+import com.retrip.crew.application.in.response.UpdatePostResponse;
+
+import java.util.UUID;
+
+public interface ManagePostUseCase {
+    CreatePostResponse createPost(UUID crewId, CreatePostRequest request);
+
+    UpdatePostResponse updatePost(UUID postId, UpdatePostRequest request);
+
+    DeletePostResponse deletePost(UUID crewId, UUID postId, UUID userId);
+
+
+}

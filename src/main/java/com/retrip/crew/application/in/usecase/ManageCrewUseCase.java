@@ -5,6 +5,8 @@ import com.retrip.crew.application.in.request.CrewUpdateRequest;
 import com.retrip.crew.application.in.response.CrewCreateResponse;
 import com.retrip.crew.application.in.response.CrewUpdateResponse;
 
+import com.retrip.crew.domain.entity.Crew;
+
 import java.util.UUID;
 
 public interface ManageCrewUseCase {

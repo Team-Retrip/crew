@@ -37,4 +37,12 @@ public class CrewMember extends BaseEntity {
         this.memberId = memberId;
         this.crewMemberRole = CrewMemberRole.valueOf(crewMemberRole.name());
     }
+
+    public boolean isLeader() {
+        return crewMemberRole == CrewMemberRole.LEADER;
+    }
+
+    public boolean isCreatedByMe(UUID postCreatedBy) {
+        return postCreatedBy == memberId;
+    }
 }
