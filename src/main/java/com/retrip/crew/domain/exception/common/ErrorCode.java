@@ -17,7 +17,9 @@ public enum ErrorCode {
     NOT_CREW_LEADER(BAD_REQUEST, "Crew-002", "크루 리더가 아니면 접근할 수 없습니다."),
     UNABLE_TO_START_RECRUITMENT(BAD_REQUEST, "Crew-003", "크루 멤버를 모집할 수 없습니다."),
     DUPLICATE_DEMAND(BAD_REQUEST, "Crew-004", "이미 크루 참여를 요청한 사용자는 다시 요청할 수 없습니다."),
-    ILLEGAL_DEMAND_STATE(BAD_REQUEST, "Crew-004", "이미 크루 참여를 요청한 사용자는 다시 요청할 수 없습니다.")
+    ILLEGAL_DEMAND_STATE(BAD_REQUEST, "Crew-004", "이미 크루 참여를 요청한 사용자는 다시 요청할 수 없습니다."),
+    INTRODUCTION_NOT_FOUND(BAD_REQUEST, "Crew-005", "크루 자기소개 엔티티를 찾을 수 없습니다."),
+    INVALID_ACCESS(FORBIDDEN, "Crew-006","접근 권한이 존재하지 않습니다."),
     ;
 
     private final HttpStatus status;

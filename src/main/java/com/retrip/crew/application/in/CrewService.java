@@ -1,5 +1,13 @@
 package com.retrip.crew.application.in;
 
+import com.retrip.crew.application.in.request.CreateDemandRequest;
+import com.retrip.crew.application.in.request.IntroductionCreateRequest;
+import com.retrip.crew.application.in.request.CrewCreateRequest;
+import com.retrip.crew.application.in.request.CrewOrder;
+import com.retrip.crew.application.in.request.CrewUpdateRequest;
+import com.retrip.crew.application.in.request.IntroductionDeleteRequest;
+import com.retrip.crew.application.in.request.IntroductionUpdateRequest;
+import com.retrip.crew.application.in.response.*;
 import com.retrip.crew.application.in.request.crew.CrewCreateRequest;
 import com.retrip.crew.application.in.request.crew.CrewOrder;
 import com.retrip.crew.application.in.request.crew.CrewUpdateRequest;
@@ -13,20 +21,27 @@ import com.retrip.crew.application.in.response.demand.*;
 import com.retrip.crew.application.in.usecase.GetCrewUseCase;
 import com.retrip.crew.application.in.usecase.ManageCrewUseCase;
 import com.retrip.crew.application.in.usecase.ManageDemandUseCase;
+import com.retrip.crew.application.in.usecase.ManageIntroductionUseCase;
 import com.retrip.crew.application.in.usecase.UpdateRecruitmentUseCase;
 import com.retrip.crew.application.out.repository.CrewDemandRepository;
 import com.retrip.crew.application.out.repository.CrewMemberRepository;
 import com.retrip.crew.application.out.repository.CrewQueryRepository;
 import com.retrip.crew.application.out.repository.CrewRepository;
+import com.retrip.crew.application.out.repository.IntroductionQueryRepository;
+import com.retrip.crew.application.out.repository.IntroductionRepository;
 import com.retrip.crew.domain.entity.Crew;
 import com.retrip.crew.domain.entity.Demand;
+import com.retrip.crew.domain.entity.Introduction;
 import com.retrip.crew.domain.entity.Recruitment;
 import com.retrip.crew.domain.exception.CrewNotFoundException;
+import com.retrip.crew.domain.exception.IntroductionNotFoundException;
 import com.retrip.crew.domain.exception.NotCrewLeaderException;
 import com.retrip.crew.domain.exception.common.BusinessException;
 import com.retrip.crew.domain.exception.common.EntityNotFoundException;
 import com.retrip.crew.domain.vo.CrewDescription;
 import com.retrip.crew.domain.vo.CrewTitle;
+import com.retrip.crew.domain.vo.IntroductionContent;
+import com.retrip.crew.domain.vo.IntroductionTitle;
 import com.retrip.crew.domain.vo.DemandStatus;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
 import com.retrip.crew.infra.util.PaginationUtils;
@@ -42,11 +57,14 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase, ManageDemandUseCase, GetCrewUseCase {
+public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase, ManageDemandUseCase, GetCrewUseCase, ManageIntroductionUseCase{
+
     private final CrewRepository crewRepository;
     private final CrewMemberRepository crewMemberRepository;
     private final CrewQueryRepository crewQueryRepository;
     private final CrewDemandRepository demandRepository;
+    private final IntroductionRepository introductionRepository;
+    private final IntroductionQueryRepository introductionQueryRepository;
 
     @Override
     public CrewCreateResponse createCrew(CrewCreateRequest request) {
@@ -56,7 +74,7 @@ public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase,
 
     @Override
     public CrewUpdateResponse updateCrew(UUID crewId, CrewUpdateRequest request) {
-        Crew crew = findById(crewId);
+        Crew crew = findCrewById(crewId);
         CrewTitle title = new CrewTitle(request.title());
         CrewDescription description = new CrewDescription(request.description());
         Recruitment recruitment = crew.getRecruitment();
@@ -68,21 +86,21 @@ public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase,
 
     @Override
     public ChangeRecruitmentStatusResponse startRecruitment(UUID crewId) {
-        Crew crew = findById(crewId);
+        Crew crew = findCrewById(crewId);
         crew.startRecruitment();
         return ChangeRecruitmentStatusResponse.of(crew);
     }
 
     @Override
     public ChangeRecruitmentStatusResponse stopRecruitment(UUID crewId) {
-        Crew crew = findById(crewId);
+        Crew crew = findCrewById(crewId);
         crew.stopRecruitment();
         return ChangeRecruitmentStatusResponse.of(crew);
     }
 
     @Override
     public CreateDemandResponse createDemand(UUID crewId, CreateDemandRequest request) {
-        Crew crew = findById(crewId);
+        Crew crew = findCrewById(crewId);
         Demand demand = crew.demand(request.memberId());
         return CreateDemandResponse.of(crew.getId(), demand);
     }
@@ -152,13 +170,63 @@ public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase,
     @Override
     @Transactional(readOnly = true)
     public CrewDetailResponse getCrewDetail(UUID crewId) {
-        Crew crew = findById(crewId);
+        Crew crew = findCrewById(crewId);
         int memberCount = crewMemberRepository.countByCrewId(crewId);
         return CrewDetailResponse.of(crew, memberCount);
     }
 
-    private Crew findById(UUID crewId){
+    @Override
+    public IntroductionCreateResponse createIntroduction(UUID crewId, IntroductionCreateRequest request) {
+        Crew crew = findCrewById(crewId);
+        Introduction introduction = request.to(crew);
+        crew.addIntroduction(introduction);
+        return IntroductionCreateResponse.from(introduction);
+    }
+
+    @Override
+    public IntroductionUpdateResponse updateIntroduction(UUID crewId, UUID introductionId, IntroductionUpdateRequest request) {
+        Introduction introduction = findIntroductionByIdAndCrewId(introductionId, crewId);
+        introduction.update(
+                new IntroductionTitle(request.title()),
+                new IntroductionContent(request.content()),
+                request.loginMemberId()
+        );
+        return IntroductionUpdateResponse.from(introduction);
+    }
+
+    @Override
+    public void deleteIntroduction(UUID crewId, UUID introductionId, IntroductionDeleteRequest request) {
+        Crew crew = findCrewById(crewId);
+        Introduction introduction = findIntroductionById(introductionId);
+        introduction.delete(request.loginMemberId(), crew);
+    }
+
+    @Override
+    public IntroductionDetailResponse getIntroduction(UUID crewId, UUID introductionId) {
+        Introduction introduction = findIntroductionByIdAndCrewId(introductionId, crewId);
+        return IntroductionDetailResponse.of(introduction);
+    }
+
+    @Override
+    public ScrollPageResponse<IntroductionListResponse> getIntroductions(UUID crewId, Pageable pageable) {
+        findCrewById(crewId);
+        Slice<IntroductionListResponse> result = introductionQueryRepository.getIntroductions(crewId, pageable);
+        Long totalCount = introductionQueryRepository.getIntroductionCount(crewId);
+        return ScrollPageResponse.of(totalCount, result.hasNext(), result.getContent());
+    }
+
+    public Crew findCrewById(UUID crewId){
         return crewRepository.findById(crewId)
                 .orElseThrow(CrewNotFoundException::new);
+    }
+
+    public Introduction findIntroductionById(UUID introductionId){
+        return introductionRepository.findById(introductionId)
+                .orElseThrow(IntroductionNotFoundException::new);
+    }
+
+    public Introduction findIntroductionByIdAndCrewId(UUID introductionId, UUID crewId) {
+        return introductionRepository.findByIdAndCrewId(introductionId, crewId)
+                .orElseThrow(IntroductionNotFoundException::new);
     }
 }
