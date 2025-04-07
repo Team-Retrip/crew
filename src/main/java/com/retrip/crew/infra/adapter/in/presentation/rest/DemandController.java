@@ -1,0 +1,108 @@
+package com.retrip.crew.infra.adapter.in.presentation.rest;
+
+import com.retrip.crew.application.in.request.crew.CrewOrder;
+import com.retrip.crew.application.in.request.demand.CreateDemandRequest;
+import com.retrip.crew.application.in.request.demand.DemandOrder;
+import com.retrip.crew.application.in.response.demand.*;
+import com.retrip.crew.application.in.usecase.ManageDemandUseCase;
+import com.retrip.crew.application.in.usecase.UpdateRecruitmentUseCase;
+import com.retrip.crew.infra.adapter.in.presentation.rest.common.ApiResponse;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+
+@RequiredArgsConstructor
+@RequestMapping("/crews")
+@RestController
+@Tag(name = "Crew", description = "크루 참여 모집 서비스")
+public class DemandController {
+    private final UpdateRecruitmentUseCase updateRecruitmentUseCase;
+    private final ManageDemandUseCase manageDemandUseCase;
+
+    @PutMapping("/{crewId}/recruitments/start")
+    @Schema(description = "크루 모집 시작")
+    public ApiResponse<ChangeRecruitmentStatusResponse> startRecruitment(@PathVariable final UUID crewId) {
+        ChangeRecruitmentStatusResponse recruitment = updateRecruitmentUseCase.startRecruitment(crewId);
+        return ApiResponse.ok(recruitment);
+    }
+
+    @PutMapping("/{crewId}/recruitments/stop")
+    @Schema(description = "크루 모집 중지")
+    public ApiResponse<ChangeRecruitmentStatusResponse> stopRecruitment(@PathVariable final UUID crewId) {
+        ChangeRecruitmentStatusResponse recruitment = updateRecruitmentUseCase.stopRecruitment(crewId);
+        return ApiResponse.ok(recruitment);
+    }
+
+    @PostMapping("/{crewId}/demands")
+    @Schema(description = "크루 참여 요청")
+    public ApiResponse<CreateDemandResponse> createDemand(
+            @PathVariable final UUID crewId,
+            @RequestBody CreateDemandRequest request) {
+        CreateDemandResponse demand = manageDemandUseCase.createDemand(crewId, request);
+        return ApiResponse.created(demand);
+    }
+
+    @PutMapping("/{crewId}/demands/{demandId}/cancel")
+    @Schema(description = "크루 참여 요청 취소")
+    public ApiResponse<Void> cancelDemand(
+            @PathVariable final UUID crewId,
+            @PathVariable final UUID demandId,
+            @RequestParam final UUID memberId) {
+        manageDemandUseCase.cancelDemand(crewId, demandId, memberId);
+        return ApiResponse.noContent();
+    }
+
+    @GetMapping("/{crewId}/demands")
+    @Schema(description = "크루 참여 요청 목록 조회")
+    public ApiResponse<Page<DemandsResponse>> getDemands(
+            @PathVariable final UUID crewId,
+            @RequestParam final UUID memberId,
+            @RequestParam final String status,
+            @PageableDefault(size = 10) Pageable pageable,
+            @RequestParam(name = "order", defaultValue = "DATE") DemandOrder order,
+            @RequestParam(name = "sort", defaultValue = "asc") String sort) {
+        Page<DemandsResponse> demands =
+                manageDemandUseCase.getDemands(crewId, memberId, status, pageable, order, sort);
+        return ApiResponse.ok(demands);
+    }
+
+    @GetMapping("/{crewId}/demands/{demandId}/crews")
+    @Schema(description = "크루 참여 요청자가 속한 크루 목록 조회")
+    public ApiResponse<Page<CrewsOfDemandResponse>> getCrewsOfDemand(
+            @PathVariable final UUID crewId,
+            @PathVariable final UUID demandId,
+            @RequestParam final UUID memberId,
+            @PageableDefault(size = 10) Pageable pageable,
+            @RequestParam(name = "order", defaultValue = "DATE") CrewOrder order,
+            @RequestParam(name = "sort", defaultValue = "asc") String sort) {
+        Page<CrewsOfDemandResponse> demands =
+                manageDemandUseCase.getCrewsOfDemand(crewId, demandId, memberId, pageable, order, sort);
+        return ApiResponse.ok(demands);
+    }
+
+    @PutMapping("/{crewId}/demands/{demandId}/approve")
+    @Schema(description = "크루 참여 요청 승인")
+    public ApiResponse<ApproveDemandResponse> approveDemand(
+            @PathVariable final UUID crewId,
+            @PathVariable final UUID demandId,
+            @RequestParam final UUID memberId) {
+        ApproveDemandResponse demand = manageDemandUseCase.approveDemand(crewId, demandId, memberId);
+        return ApiResponse.ok(demand);
+    }
+
+    @PutMapping("/{crewId}/demands/{demandId}/reject")
+    @Schema(description = "크루 참여 요청 거절")
+    public ApiResponse<RejectDemandResponse> rejectDemand(
+            @PathVariable final UUID crewId,
+            @PathVariable final UUID demandId,
+            @RequestParam final UUID memberId) {
+        RejectDemandResponse demand = manageDemandUseCase.rejectDemand(crewId, demandId, memberId);
+        return ApiResponse.ok(demand);
+    }
+}

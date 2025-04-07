@@ -1,4 +1,4 @@
-package com.retrip.crew.application.in.request;
+package com.retrip.crew.application.in.request.crew;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Size;

@@ -21,5 +21,9 @@ public enum CrewMemberRole {
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 코드입니다."));
     }
+
+    public static boolean isLeaderRole(CrewMemberRole role) {
+        return LEADER == role;
+    }
 }
 

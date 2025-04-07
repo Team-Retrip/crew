@@ -1,6 +1,7 @@
 package com.retrip.crew.common;
 
 import com.retrip.crew.application.in.CrewService;
+import com.retrip.crew.application.out.repository.CrewDemandRepository;
 import com.retrip.crew.application.out.repository.CrewMemberRepository;
 import com.retrip.crew.application.out.repository.CrewQueryRepository;
 import com.retrip.crew.application.out.repository.CrewRepository;
@@ -10,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-
-import java.util.UUID;
 
 @DataJpaTest
 @Import(QuerydslConfig.class)
@@ -27,12 +26,13 @@ public class ServiceTest {
     @Autowired
     protected CrewQueryRepository crewQueryRepository;
 
-    protected CrewService crewService;
+    @Autowired
+    protected CrewDemandRepository demandRepository;
 
-    protected UUID MEMBER_ID = UUID.fromString("13c8ab91-76bc-4f70-93e9-89f1a65dc640");
+    protected CrewService crewService;
 
     @BeforeEach
     void setUp() {
-        crewService = new CrewService(crewRepository, crewMemberRepository, crewQueryRepository);
+        crewService = new CrewService(crewRepository, crewMemberRepository, crewQueryRepository, demandRepository);
     }
 }

@@ -1,6 +1,6 @@
 package com.retrip.crew.application.in.usecase;
 
-import com.retrip.crew.application.in.response.ChangeRecruitmentStatusResponse;
+import com.retrip.crew.application.in.response.demand.ChangeRecruitmentStatusResponse;
 
 import java.util.UUID;
 

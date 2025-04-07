@@ -7,18 +7,25 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberPath;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.retrip.crew.application.in.request.CrewOrder;
-import com.retrip.crew.application.in.response.CrewListResponse;
+import com.retrip.crew.application.in.request.crew.CrewOrder;
+import com.retrip.crew.application.in.response.crew.CrewListResponse;
+import com.retrip.crew.application.in.response.demand.CrewsOfDemandResponse;
 import com.retrip.crew.application.out.repository.CrewQueryRepository;
+import com.retrip.crew.domain.entity.CrewMemberRole;
 import com.retrip.crew.domain.entity.QCrewMember;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 import static com.querydsl.jpa.JPAExpressions.select;
 import static com.retrip.crew.domain.entity.QCrew.crew;
@@ -39,11 +46,16 @@ public class CrewQuerydslRepository implements CrewQueryRepository {
         List<CrewListResponse> fetch = query.select(Projections.constructor(CrewListResponse.class,
                                 crew.id.as("id"),
                                 crew.title.value.as("title"),
-                                crewMember.id.as("leaderId"),
+                                JPAExpressions.select(subCrewMember.memberId.as("leaderId"))
+                                        .from(subCrewMember)
+                                        .where(
+                                                subCrewMember.crewMemberRole.eq(CrewMemberRole.LEADER),
+                                                subCrewMember.crew.id.eq(crewMember.crew.id)
+                                        ),
                                 ExpressionUtils.as(
                                         select(subCrewMember.count())
-                                        .from(subCrewMember)
-                                        .where(subCrewMember.crew.id.eq(crew.id)) ,MemberCountAlias),
+                                                .from(subCrewMember)
+                                                .where(subCrewMember.crew.id.eq(crew.id)), MemberCountAlias),
                                 crew.recruitment.maxMembers.as("maxMemberCount")
                         )
                 )
@@ -71,6 +83,53 @@ public class CrewQuerydslRepository implements CrewQueryRepository {
 
     private BooleanExpression crewTitleContains(String title) {
         return title == null ? null : crew.title.value.contains(title);
+    }
+
+    @Override
+    public Page<CrewsOfDemandResponse> findAllContainsMember(Pageable pageable, UUID memberId) {
+        OrderSpecifier<?> orderSpecifier = createCrewOrderSpecifier(pageable);
+        Expressions.numberPath(Long.class, "memberCount");
+        QCrewMember subCrewMember = new QCrewMember("subCrewMember");
+        List<CrewsOfDemandResponse> result =
+                query.select(
+                                Projections.constructor(CrewsOfDemandResponse.class,
+                                        crewMember.memberId.as("memberId"),
+                                        crew.id.as("id"),
+                                        crew.title.value.as("title"),
+                                        JPAExpressions.select(subCrewMember.memberId.as("leaderId"))
+                                                .from(subCrewMember)
+                                                .where(
+                                                        subCrewMember.crewMemberRole.eq(CrewMemberRole.LEADER),
+                                                        subCrewMember.crew.id.eq(crewMember.crew.id)
+                                                ),
+                                        JPAExpressions.select(subCrewMember.count().as("memberCount"))
+                                                .from(subCrewMember)
+                                                .where(subCrewMember.crew.id.eq(crew.id)),
+                                        crew.recruitment.maxMembers.as("maxMemberCount")
+                                )
+                        )
+                        .from(crew)
+                        .rightJoin(crewMember)
+                        .on(crewMember.crew.id.eq(crew.id))
+                        .where(
+                                crewMemberContains(memberId)
+                        )
+                        .limit(pageable.getPageSize() + 1)
+                        .offset(pageable.getOffset())
+                        .orderBy(orderSpecifier)
+                        .fetch();
+
+        JPAQuery<Long> countQuery = query.select(crew.count())
+                .from(crew)
+                .rightJoin(crewMember).on(crewMember.crew.id.eq(crew.id))
+                .where(
+                        crewMemberContains(memberId)
+                );
+        return PageableExecutionUtils.getPage(result, pageable, countQuery::fetchOne);
+    }
+
+    private BooleanExpression crewMemberContains(UUID memberId) {
+        return memberId == null ? null : crewMember.memberId.eq(memberId);
     }
 
     private OrderSpecifier<?> createCrewOrderSpecifier(Pageable pageable) {

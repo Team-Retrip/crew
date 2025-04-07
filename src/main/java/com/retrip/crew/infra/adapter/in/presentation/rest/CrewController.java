@@ -1,10 +1,15 @@
 package com.retrip.crew.infra.adapter.in.presentation.rest;
 
-import com.retrip.crew.application.in.request.CreateDemandRequest;
-import com.retrip.crew.application.in.request.CrewCreateRequest;
-import com.retrip.crew.application.in.request.CrewOrder;
-import com.retrip.crew.application.in.request.CrewUpdateRequest;
-import com.retrip.crew.application.in.response.*;
+import com.retrip.crew.application.in.request.crew.CrewCreateRequest;
+import com.retrip.crew.application.in.request.crew.CrewOrder;
+import com.retrip.crew.application.in.request.crew.CrewUpdateRequest;
+import com.retrip.crew.application.in.request.demand.CreateDemandRequest;
+import com.retrip.crew.application.in.request.demand.DemandOrder;
+import com.retrip.crew.application.in.response.crew.CrewCreateResponse;
+import com.retrip.crew.application.in.response.crew.CrewDetailResponse;
+import com.retrip.crew.application.in.response.crew.CrewListResponse;
+import com.retrip.crew.application.in.response.crew.CrewUpdateResponse;
+import com.retrip.crew.application.in.response.demand.*;
 import com.retrip.crew.application.in.usecase.GetCrewUseCase;
 import com.retrip.crew.application.in.usecase.ManageCrewUseCase;
 import com.retrip.crew.application.in.usecase.ManageDemandUseCase;
@@ -14,6 +19,7 @@ import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageRespo
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +33,6 @@ import java.util.UUID;
 @Tag(name = "Crew", description = "크루 서비스")
 public class CrewController {
     private final ManageCrewUseCase manageCrewUseCase;
-    private final UpdateRecruitmentUseCase updateRecruitmentUseCase;
-    private final ManageDemandUseCase manageDemandUseCase;
     private final GetCrewUseCase getCrewUseCase;
 
     @PostMapping
@@ -44,29 +48,6 @@ public class CrewController {
             @PathVariable UUID crewId, @RequestBody CrewUpdateRequest request) {
         CrewUpdateResponse crew = manageCrewUseCase.updateCrew(crewId, request);
         return ApiResponse.ok(crew);
-    }
-
-    @PutMapping("/{crewId}/recruitments/start")
-    @Schema(description = "크루 모집 시작")
-    public ApiResponse<ChangeRecruitmentStatusResponse> startRecruitment(@PathVariable final UUID crewId) {
-        ChangeRecruitmentStatusResponse recruitment = updateRecruitmentUseCase.startRecruitment(crewId);
-        return ApiResponse.ok(recruitment);
-    }
-
-    @PutMapping("/{crewId}/recruitments/stop")
-    @Schema(description = "크루 모집 중지")
-    public ApiResponse<ChangeRecruitmentStatusResponse> stopRecruitment(@PathVariable final UUID crewId) {
-        ChangeRecruitmentStatusResponse recruitment = updateRecruitmentUseCase.stopRecruitment(crewId);
-        return ApiResponse.ok(recruitment);
-    }
-
-    @PostMapping("/{crewId}/demands")
-    @Schema(description = "크루 참여 요청")
-    public ApiResponse<CreateDemandResponse> createDemand(
-            @PathVariable final UUID crewId,
-            @RequestBody CreateDemandRequest request) {
-        CreateDemandResponse demand = manageDemandUseCase.createDemand(crewId, request);
-        return ApiResponse.created(demand);
     }
 
     @GetMapping

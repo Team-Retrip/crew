@@ -82,4 +82,16 @@ public class Crew extends BaseEntity {
         return description.getValue();
     }
 
+    public void cancelDemand(Demand demand) {
+        recruitment.cancelDemand(demand);
+    }
+
+    public void rejectDemand(Demand demand) {
+        recruitment.rejectDemand(demand);
+    }
+
+    public void approveDemand(Demand demand) {
+        recruitment.approveDemand(demand);
+        crewMembers.addMember(demand, this);
+    }
 }
