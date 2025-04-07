@@ -16,7 +16,7 @@ import com.retrip.crew.common.ServiceTest;
 import com.retrip.crew.domain.entity.Crew;
 import com.retrip.crew.domain.entity.CrewMemberRole;
 import com.retrip.crew.domain.entity.Demand;
-import com.retrip.crew.domain.exception.common.IllegalStateException;
+import com.retrip.crew.domain.exception.DuplicateDemandException;
 import com.retrip.crew.domain.vo.DemandStatus;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
 import org.junit.jupiter.api.Test;
@@ -103,7 +103,7 @@ class CrewServiceTest extends ServiceTest {
 
         // when, then
         assertThatThrownBy(() -> crewService.createDemand(save.getId(), request))
-                .isExactlyInstanceOf(IllegalStateException.class);
+                .isExactlyInstanceOf(DuplicateDemandException.class);
     }
 
     @Test

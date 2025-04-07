@@ -1,6 +1,6 @@
 package com.retrip.crew.domain.entity;
 
-import com.retrip.crew.domain.exception.common.IllegalStateException;
+import com.retrip.crew.domain.exception.IllegalDemandStateException;
 import com.retrip.crew.domain.vo.DemandStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -84,7 +84,7 @@ class RecruitmentTest {
 
         // when, then
         assertThatThrownBy(() -> recruitment.cancelDemand(demand))
-                .isExactlyInstanceOf(IllegalStateException.class);
+                .isExactlyInstanceOf(IllegalDemandStateException.class);
     }
 
     @Test

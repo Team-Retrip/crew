@@ -1,6 +1,8 @@
 package com.retrip.crew.domain.entity;
 
-import com.retrip.crew.domain.exception.common.IllegalStateException;
+import com.retrip.crew.domain.exception.DuplicateDemandException;
+import com.retrip.crew.domain.exception.IllegalDemandStateException;
+import com.retrip.crew.domain.exception.UnableToStartRecruitmentException;
 import com.retrip.crew.domain.exception.common.InvalidValueException;
 import com.retrip.crew.domain.vo.RecruitmentStatus;
 import jakarta.persistence.CascadeType;
@@ -39,7 +41,7 @@ public class Recruitment {
     public void start(int membersSize) {
         if (isRecruitmentComplete(membersSize)) {
             stop();
-            throw new IllegalStateException("최대 인원을 모두 모집 완료하여 더 이상 멤버를 모집할 수 없습니다.");
+            throw new UnableToStartRecruitmentException("최대 인원을 모두 모집 완료하여 더 이상 멤버를 모집할 수 없습니다.");
         }
         this.status = RECRUITING;
     }
@@ -58,7 +60,7 @@ public class Recruitment {
 
     public Demand addDemand(UUID memberId, Crew crew) {
         if (isDuplicate(memberId)) {
-            throw new IllegalStateException("이미 요청한 사용자는 다시 요청할 수 없습니다.");
+            throw new DuplicateDemandException();
         }
         Optional<Demand> reDemand = findReDemand(memberId);
         if (reDemand.isPresent()) {
@@ -106,7 +108,7 @@ public class Recruitment {
 
     private static void throwIfNotPending(Demand find) {
         if (find.isNotPending()) {
-            throw new IllegalStateException("참여 요청의 상태가 대기중이 아닙니다.");
+            throw new IllegalDemandStateException("참여 요청의 상태가 대기중이 아닙니다.");
         }
     }
 

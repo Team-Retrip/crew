@@ -1,6 +1,6 @@
 package com.retrip.crew.domain.entity;
 
-import com.retrip.crew.domain.exception.common.IllegalStateException;
+import com.retrip.crew.domain.exception.UnableToStartRecruitmentException;
 import com.retrip.crew.domain.vo.RecruitmentStatus;
 import org.junit.jupiter.api.Test;
 
@@ -60,7 +60,7 @@ class CrewTest {
 
         // when, then
         assertThatThrownBy(crew::startRecruitment)
-                .isExactlyInstanceOf(IllegalStateException.class);
+                .isExactlyInstanceOf(UnableToStartRecruitmentException.class);
         assertThat(crew.getRecruitment().getStatus()).isEqualTo(RecruitmentStatus.STOPPED);
     }
 }
