@@ -9,7 +9,7 @@ public class DemandStatusConverter implements AttributeConverter<DemandStatus, S
     @Override
     public String convertToDatabaseColumn(DemandStatus status) {
         if(status == null){
-            throw new NullPointerException("crewMemberRole을 DB 칼럼으로 변경하는 과정에서 null이 포함되었습니다.");
+            throw new NullPointerException("DemandStatus를 DB 칼럼으로 변경하는 과정에서 null이 포함되었습니다.");
         }
         return status.getCode();
     }
@@ -17,7 +17,7 @@ public class DemandStatusConverter implements AttributeConverter<DemandStatus, S
     @Override
     public DemandStatus convertToEntityAttribute(String dbData) {
         if(dbData == null){
-            throw new NullPointerException("CrewMember 테이블의 role 값이 null입니다.");
+            throw new NullPointerException("DemandStatus 테이블의 role 값이 null입니다.");
         }
         return DemandStatus.codeOf(dbData);
     }
