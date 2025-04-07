@@ -106,6 +106,19 @@ class CrewServiceTest extends ServiceTest {
                 .isExactlyInstanceOf(IllegalStateException.class);
     }
 
+    @Test
+    void 크루_참여_요청을_취소한다() {
+        // given
+        Crew crew = crewRepository.save(createCrew(LEADER_ID));
+        Demand demand = crew.demand(MEMBER_ID);
+
+        // when
+        crewService.cancelDemand(crew.getId(), demand.getId(), MEMBER_ID);
+
+        // then
+        assertThat(demand.getStatus()).isEqualTo(DemandStatus.CANCELED);
+    }
+
     @ParameterizedTest
     @CsvSource({"PENDING,2", "APPROVED,2", "REJECTED,1"})
     void 리더가_크루_요청_목록을_조회한다(String status, int expected) {

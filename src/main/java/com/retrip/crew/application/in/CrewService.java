@@ -114,29 +114,29 @@ public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase,
 
     @Override
     public void cancelDemand(UUID crewId, UUID demandId, UUID memberId) {
-        Crew crew = findById(crewId);
         Demand demand = findDemandByIdAndCrewId(demandId, crewId);
+        Crew crew = demand.getCrew();
         crew.cancelDemand(demand);
     }
 
     @Override
     public RejectDemandResponse rejectDemand(UUID crewId, UUID demandId, UUID memberId) {
-        Crew crew = findById(crewId);
         Demand demand = findDemandByIdAndCrewId(demandId, crewId);
+        Crew crew = demand.getCrew();
         crew.rejectDemand(demand);
         return RejectDemandResponse.of(demand);
     }
 
     @Override
     public ApproveDemandResponse approveDemand(UUID crewId, UUID demandId, UUID memberId) {
-        Crew crew = findById(crewId);
         Demand demand = findDemandByIdAndCrewId(demandId, crewId);
+        Crew crew = demand.getCrew();
         crew.approveDemand(demand);
         return ApproveDemandResponse.of(demand);
     }
 
     private Demand findDemandByIdAndCrewId(UUID demandId, UUID crewId) {
-        return demandRepository.findByIdAndCrewId(demandId, crewId)
+        return demandRepository.findCrewByIdAndCrewId(demandId, crewId)
                 .orElseThrow(() -> new EntityNotFoundException("참여 요청 엔티티를 찾을 수 없습니다."));
     }
 

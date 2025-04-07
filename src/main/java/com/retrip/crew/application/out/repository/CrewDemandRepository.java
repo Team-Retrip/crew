@@ -5,6 +5,7 @@ import com.retrip.crew.domain.vo.DemandStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -12,5 +13,6 @@ import java.util.UUID;
 public interface CrewDemandRepository extends JpaRepository<Demand, UUID> {
     Page<Demand> findByCrewIdAndStatus(UUID crewId, DemandStatus pending, Pageable pageRequest);
 
-    Optional<Demand> findByIdAndCrewId(UUID demandId, UUID crewId);
+    @Query("select d, c from Demand d join fetch d.crew c where d.id = :demandId and c.id = :crewId")
+    Optional<Demand> findCrewByIdAndCrewId(UUID demandId, UUID crewId);
 }
