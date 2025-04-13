@@ -26,9 +26,9 @@ public record CrewCreateRequest(
 
 
         @Schema(description = "크루 참여 질문 리스트")
-        CreateCrewQuestionRequest questions // 질문 리스트 추가
+        CreateCrewQuestionRequest questions
 ) {
-    @Schema(description = "크루 참여 요청 질문 등록 Request")
+    @Schema(description = "크루 참여 요청 질문 Request")
     public record CreateCrewQuestionRequest(
 
             @Schema(description = "크루 참여 요청 질문")

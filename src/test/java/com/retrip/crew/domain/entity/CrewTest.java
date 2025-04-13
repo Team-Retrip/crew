@@ -99,4 +99,6 @@ class CrewTest {
                 .isExactlyInstanceOf(IllegalStateException.class);
         assertThat(crew.getRecruitment().getStatus()).isEqualTo(RecruitmentStatus.STOPPED);
     }
+
+
 }

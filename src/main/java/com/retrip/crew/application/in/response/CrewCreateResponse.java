@@ -40,7 +40,7 @@ public record CrewCreateResponse(
                 crew.getLeader().getId(),
                 crew.getRecruitment().getMaxMembers(),
                 crew.getRecruitment().getStatus(),
-                crew.getQuestions()
+                crew.getRecruitment().getRecruitmentQuestions()
         );
     }
 }

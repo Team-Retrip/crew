@@ -12,7 +12,7 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 @Getter
-public class Question {
+public class RecruitmentQuestion {
 
     @Id
     @Column(columnDefinition = "varbinary(16)")
@@ -30,13 +30,13 @@ public class Question {
     )
     private Crew crew;
 
-    public Question(String content, Crew crew) {
+    public RecruitmentQuestion(UUID id,String content, Crew crew) {
         this.id = UUID.randomUUID();
         this.content = new QuestionContent(content);
         this.crew = crew;
     }
 
-    public static Question create(String content, Crew crew) {
-        return new Question(content, crew);
+    public static RecruitmentQuestion create(String content, Crew crew) {
+        return new RecruitmentQuestion(UUID.randomUUID(), content, crew);
     }
 }

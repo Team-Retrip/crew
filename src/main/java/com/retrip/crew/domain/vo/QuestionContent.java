@@ -1,5 +1,6 @@
 package com.retrip.crew.domain.vo;
 
+import com.retrip.crew.domain.exception.common.ErrorCode;
 import com.retrip.crew.domain.exception.common.InvalidValueException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -14,9 +15,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class QuestionContent {
 
-    private static final int CONTENT_LENGTH_LIMIT = 100;
+    private static final int MIN_LENGTH = 10;
+    private static final int MAX_LENGTH = 100;
 
-    @Column(name = "content", nullable = false, length = CONTENT_LENGTH_LIMIT)
+    @Column(name = "content", nullable = false, length = MAX_LENGTH)
     private final String value;
 
     public QuestionContent(String value) {
@@ -25,8 +27,8 @@ public class QuestionContent {
     }
 
     private void validate(String value) {
-        if (value.length() > CONTENT_LENGTH_LIMIT) {
-            throw new InvalidValueException("질문 내용은 " + CONTENT_LENGTH_LIMIT + "자를 넘을 수 없습니다.");
+        if (value == null || value.trim().length() < MIN_LENGTH || value.length() > MAX_LENGTH) {
+            throw new InvalidValueException(ErrorCode.INVALID_QUESTION_LENGTH);
         }
     }
 }

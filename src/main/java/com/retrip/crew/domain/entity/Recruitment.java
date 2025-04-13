@@ -4,6 +4,7 @@ import com.retrip.crew.domain.exception.common.IllegalStateException;
 import com.retrip.crew.domain.vo.RecruitmentStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -26,10 +27,21 @@ public class Recruitment {
     @OneToMany(mappedBy = "crew", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Demand> demands = new ArrayList<>();
 
-    public Recruitment(int maxMembers) {
+    @Embedded
+    private RecruitmentQuestions recruitmentQuestions;
+
+    private Recruitment(int maxMembers, RecruitmentQuestions recruitmentQuestions) {
         this.maxMembers = maxMembers;
         this.status = RECRUITING;
+        this.recruitmentQuestions = recruitmentQuestions;
     }
+
+    public static Recruitment of(int maxMembers, List<String> questions, Crew crew) {
+        RecruitmentQuestions recruitmentQuestions = new RecruitmentQuestions(questions, crew);
+        return new Recruitment(maxMembers, recruitmentQuestions);
+    }
+
+
 
     public void start(int membersSize) {
         if (isRecruitmentComplete(membersSize)) {
@@ -65,4 +77,11 @@ public class Recruitment {
                 .map(Demand::getMemberId)
                 .anyMatch(id -> id.equals(memberId));
     }
+
+    public List<String> getRecruitmentQuestions() {
+        return recruitmentQuestions.getValues().stream()
+                .map(question -> question.getContent().getValue())
+                .toList();
+    }
+
 }

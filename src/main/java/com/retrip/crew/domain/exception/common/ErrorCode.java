@@ -13,8 +13,12 @@ public enum ErrorCode {
     ENTITY_NOT_FOUND(BAD_REQUEST, "Common-004", "Entity not found"),
     ILLEGAL_STATE(BAD_REQUEST, "Common-005", "Illegal state"),
 
-    CREW_NOT_FOUND(BAD_REQUEST, "Crew-001", "크루 엔티티를 찾을 수 없습니다.")
-    ;
+
+    CREW_NOT_FOUND(BAD_REQUEST, "Crew-001", "크루 엔티티를 찾을 수 없습니다."),
+    INVALID_QUESTION_COUNT(BAD_REQUEST, "Crew-002", "질문은 최대 10개까지 입력할 수 있습니다."),
+    INVALID_QUESTION_LENGTH(BAD_REQUEST, "Crew-003", "각 질문은 10자 이상 200자 이하로 입력해야 합니다.")
+
+            ;
 
     private final HttpStatus status;
     private final String code;
