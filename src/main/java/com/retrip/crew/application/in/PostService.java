@@ -1,70 +1,86 @@
 package com.retrip.crew.application.in;
 
 import com.retrip.crew.application.in.request.CreatePostRequest;
+import com.retrip.crew.application.in.request.PostOrder;
 import com.retrip.crew.application.in.request.UpdatePostRequest;
 import com.retrip.crew.application.in.response.CreatePostResponse;
 import com.retrip.crew.application.in.response.DeletePostResponse;
+import com.retrip.crew.application.in.response.PostResponse;
 import com.retrip.crew.application.in.response.UpdatePostResponse;
+import com.retrip.crew.application.in.usecase.GetPostUseCase;
 import com.retrip.crew.application.in.usecase.ManagePostUseCase;
 import com.retrip.crew.application.out.repository.CrewMemberQueryRepository;
-import com.retrip.crew.application.out.repository.PostRepository;
+import com.retrip.crew.application.out.repository.CrewQueryRepository;
+import com.retrip.crew.application.out.repository.PostQueryRepository;
 import com.retrip.crew.domain.entity.Crew;
 import com.retrip.crew.domain.entity.CrewMember;
 import com.retrip.crew.domain.entity.Post;
 import com.retrip.crew.domain.exception.CrewMemberNotFoundException;
-import com.retrip.crew.domain.exception.PostNotFoundException;
+
+import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
+import com.retrip.crew.infra.util.PaginationUtils;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 @RequiredArgsConstructor
-public class PostService implements ManagePostUseCase {
-    private final CrewService crewService;
-    private final PostRepository postRepository;
+public class PostService implements ManagePostUseCase, GetPostUseCase {
+    private final CrewQueryRepository crewQueryRepository;
     private final CrewMemberQueryRepository crewMemberQueryRepository;
-
-
+    private final PostQueryRepository postQueryRepository;
 
     @Override
-    @Transactional
     public CreatePostResponse createPost(UUID crewId, CreatePostRequest request) {
-        Crew crew = crewService.findById(crewId);
-        Post post = postRepository.save(request.to(crew));
+        Crew crew =
+                crewQueryRepository
+                        .findByIdWithPosts(crewId)
+                        .orElseThrow(CrewMemberNotFoundException::new);
+        Post post = request.to(crew);
+        crew.addPost(post);
         return CreatePostResponse.of(post);
     }
 
     @Override
-    @Transactional
-    public UpdatePostResponse updatePost(UUID postId, UpdatePostRequest request) {
-        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        post.update(request.title(), request.content(), request.userId());
+    public UpdatePostResponse updatePost(UUID crewId, UUID postId, UpdatePostRequest request) {
+        Crew crew =
+                crewQueryRepository
+                        .findByIdWithPosts(crewId)
+                        .orElseThrow(CrewMemberNotFoundException::new);
+        Post post = crew.updatePost(postId, request.title(), request.content(), request.userId());
         return UpdatePostResponse.of(post);
     }
 
     @Override
-    @Transactional
     public DeletePostResponse deletePost(UUID crewId, UUID postId, UUID userId) {
+        Crew crew =
+                crewQueryRepository
+                        .findByIdWithPosts(crewId)
+                        .orElseThrow(CrewMemberNotFoundException::new);
         CrewMember crewMember = findCrewMemberByUserId(crewId, userId);
-        Post post = findPostById(postId);
-        if (post.isDeletable(crewMember)) {
-            postRepository.deleteById(postId);
-            return DeletePostResponse.of(postId);
-        }
-        throw new PostNotFoundException();
+        UUID deleteId = crew.deletePost(postId, crewMember);
+        return DeletePostResponse.of(deleteId);
     }
 
     private CrewMember findCrewMemberByUserId(UUID crewId, UUID userId) {
-        return crewMemberQueryRepository.findCrewMemberByUserId(crewId, userId)
+        return crewMemberQueryRepository
+                .findCrewMemberByUserId(crewId, userId)
                 .orElseThrow(CrewMemberNotFoundException::new);
     }
 
-
-    private Post findPostById(UUID postId) {
-        return postRepository.findById(postId)
-                .orElseThrow(PostNotFoundException::new);
+    @Override
+    public ScrollPageResponse<PostResponse> getPosts(UUID crewId, Pageable page, String keyword, PostOrder order, String sort) {
+        Pageable orderPageable =
+                PaginationUtils.createPageRequest(page, order.getField(), sort);
+        Slice<PostResponse> result = postQueryRepository.findPosts(crewId, orderPageable, keyword);
+        Long totalCount = postQueryRepository.getPostCount(crewId, keyword);
+        return ScrollPageResponse.of(totalCount, result.hasNext(), result.getContent());
     }
 }

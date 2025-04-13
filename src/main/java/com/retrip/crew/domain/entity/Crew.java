@@ -1,5 +1,6 @@
 package com.retrip.crew.domain.entity;
 
+import com.retrip.crew.application.in.response.DeletePostResponse;
 import com.retrip.crew.domain.vo.CrewDescription;
 import com.retrip.crew.domain.vo.CrewTitle;
 import jakarta.persistence.*;
@@ -82,4 +83,15 @@ public class Crew extends BaseEntity {
         return description.getValue();
     }
 
+    public void addPost(Post post) {
+        this.posts.getValues().add(post);
+    }
+
+    public Post updatePost(UUID postId, String title, String content, UUID userId) {
+        return this.posts.updatePost(postId, title, content, userId);
+    }
+
+    public UUID deletePost(UUID postId, CrewMember crewMember) {
+        return this.posts.deletePost(postId, crewMember);
+    }
 }

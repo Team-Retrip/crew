@@ -20,7 +20,9 @@ import com.retrip.crew.domain.vo.CrewDescription;
 import com.retrip.crew.domain.vo.CrewTitle;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
 import com.retrip.crew.infra.util.PaginationUtils;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -31,7 +33,11 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase, ManageDemandUseCase, GetCrewUseCase {
+public class CrewService
+        implements ManageCrewUseCase,
+                UpdateRecruitmentUseCase,
+                ManageDemandUseCase,
+                GetCrewUseCase {
     private final CrewRepository crewRepository;
     private final CrewMemberRepository crewMemberRepository;
     private final CrewQueryRepository crewQueryRepository;
@@ -77,8 +83,10 @@ public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase,
 
     @Override
     @Transactional(readOnly = true)
-    public ScrollPageResponse<CrewListResponse> getCrews(Pageable pageable, String keyword, CrewOrder order, String sort) {
-        Pageable orderPageable = PaginationUtils.createPageRequest(pageable, order.getField(), sort);
+    public ScrollPageResponse<CrewListResponse> getCrews(
+            Pageable pageable, String keyword, CrewOrder order, String sort) {
+        Pageable orderPageable =
+                PaginationUtils.createPageRequest(pageable, order.getField(), sort);
         Slice<CrewListResponse> result = crewQueryRepository.getCrews(orderPageable, keyword);
         Long totalCount = crewQueryRepository.getCrewCount(keyword);
         return ScrollPageResponse.of(totalCount, result.hasNext(), result.getContent());
@@ -92,8 +100,7 @@ public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase,
         return CrewDetailResponse.of(crew, memberCount);
     }
 
-    public Crew findById(UUID crewId){
-        return crewRepository.findById(crewId)
-                .orElseThrow(CrewNotFoundException::new);
+    private Crew findById(UUID crewId) {
+        return crewRepository.findById(crewId).orElseThrow(CrewNotFoundException::new);
     }
 }

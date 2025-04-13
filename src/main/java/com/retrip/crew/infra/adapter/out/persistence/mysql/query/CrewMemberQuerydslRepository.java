@@ -19,10 +19,10 @@ public class CrewMemberQuerydslRepository implements CrewMemberQueryRepository {
 
     @Override
     public Optional<CrewMember> findCrewMemberByUserId(UUID crewId, UUID userId) {
-        return Optional.ofNullable(query.select(crewMember)
-                .from(crew)
-                .join(crewMember).on(crewMember.crew.id.eq(crew.id))
-                .where(crewMember.memberId.eq(userId), crew.id.eq(crewId))
-                .fetchOne());
+        return Optional.ofNullable(
+                query.selectFrom(crewMember)
+                        .join(crew)
+                        .on(crewMember.crew.id.eq(crewId), crewMember.memberId.eq(userId))
+                        .fetchOne());
     }
 }
