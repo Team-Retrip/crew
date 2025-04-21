@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface CrewDemandRepository extends JpaRepository<Demand, UUID> {
+public interface CrewDemandRepository extends ReadRepository<Demand, UUID> {
     Page<Demand> findByCrewIdAndStatus(UUID crewId, DemandStatus pending, Pageable pageRequest);
 
     @Query("select d, c from Demand d join fetch d.crew c where d.id = :demandId and c.id = :crewId")
