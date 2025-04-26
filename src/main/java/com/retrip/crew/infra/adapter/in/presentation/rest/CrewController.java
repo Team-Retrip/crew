@@ -6,6 +6,7 @@ import com.retrip.crew.application.in.request.IntroductionUpdateRequest;
 import com.retrip.crew.application.in.request.crew.CrewCreateRequest;
 import com.retrip.crew.application.in.request.crew.CrewOrder;
 import com.retrip.crew.application.in.request.crew.CrewUpdateRequest;
+import com.retrip.crew.application.in.request.crew.CrewWithdrawalRequest;
 import com.retrip.crew.application.in.response.IntroductionCreateResponse;
 import com.retrip.crew.application.in.response.IntroductionDetailResponse;
 import com.retrip.crew.application.in.response.IntroductionListResponse;
@@ -21,20 +22,13 @@ import com.retrip.crew.infra.adapter.in.presentation.rest.common.ApiResponse;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RequestMapping("/crews")
@@ -128,5 +122,14 @@ public class CrewController {
     ) {
         ScrollPageResponse<IntroductionListResponse> response = manageIntroductionUseCase.getIntroductions(crewId, pageable);
         return ApiResponse.ok(response);
+    }
+
+    @Schema(description = "크루 탈퇴")
+    @PutMapping("/{crewId}/withdrawal")
+    public ApiResponse<Void> withdrawCrew(
+            @PathVariable final UUID crewId,
+            @RequestBody CrewWithdrawalRequest request) {
+        manageCrewUseCase.withdrawCrew(crewId, request);
+        return ApiResponse.noContent();
     }
 }

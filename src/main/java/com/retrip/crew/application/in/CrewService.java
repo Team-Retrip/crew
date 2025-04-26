@@ -6,6 +6,7 @@ import com.retrip.crew.application.in.request.IntroductionUpdateRequest;
 import com.retrip.crew.application.in.request.crew.CrewCreateRequest;
 import com.retrip.crew.application.in.request.crew.CrewOrder;
 import com.retrip.crew.application.in.request.crew.CrewUpdateRequest;
+import com.retrip.crew.application.in.request.crew.CrewWithdrawalRequest;
 import com.retrip.crew.application.in.response.IntroductionCreateResponse;
 import com.retrip.crew.application.in.response.IntroductionDetailResponse;
 import com.retrip.crew.application.in.response.IntroductionListResponse;
@@ -19,6 +20,7 @@ import com.retrip.crew.application.in.usecase.ManageCrewUseCase;
 import com.retrip.crew.application.in.usecase.ManageIntroductionUseCase;
 import com.retrip.crew.application.out.repository.*;
 import com.retrip.crew.domain.entity.Crew;
+import com.retrip.crew.domain.entity.CrewMembers;
 import com.retrip.crew.domain.entity.Introduction;
 import com.retrip.crew.domain.entity.Recruitment;
 import com.retrip.crew.domain.exception.CrewNotFoundException;
@@ -135,5 +137,12 @@ public class CrewService implements ManageCrewUseCase, GetCrewUseCase, ManageInt
     public Introduction findIntroductionByIdAndCrewId(UUID introductionId, UUID crewId) {
         return introductionRepository.findByIdAndCrewId(introductionId, crewId)
                 .orElseThrow(IntroductionNotFoundException::new);
+    }
+
+    @Override
+    public void withdrawCrew(UUID crewId, CrewWithdrawalRequest request) {
+        Crew crew = findCrewById(crewId);
+        CrewMembers crewMembers = crew.getCrewMembers();
+        crewMembers.withdraw(request.memberId(), request.participatingCrewTrips());
     }
 }

@@ -1,5 +1,7 @@
 package com.retrip.crew.domain.entity;
 
+import com.retrip.crew.domain.CrewTrip;
+import com.retrip.crew.domain.exception.ImpossibleWithdrawCrewException;
 import com.retrip.crew.domain.exception.common.IllegalStateException;
 import com.retrip.crew.domain.exception.common.InvalidValueException;
 import jakarta.persistence.CascadeType;
@@ -8,6 +10,7 @@ import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,10 +43,7 @@ public class CrewMembers {
     }
 
     public boolean isLeader(UUID memberId) {
-        return this.values.stream()
-                .filter(m -> memberId.equals(m.getMemberId()))
-                .findFirst()
-                .orElseThrow(() -> new InvalidValueException("크루 멤버가 아닙니다."))
+        return findMember(memberId)
                 .isLeader();
     }
 
@@ -58,5 +58,36 @@ public class CrewMembers {
     private boolean isDuplicate(Demand demand) {
         return this.values.stream()
                 .anyMatch(m -> m.getMemberId().equals(demand.getMemberId()));
+    }
+
+    public void withdraw(UUID memberId, List<CrewTrip> participatingCrewTrips) {
+        validatePossibleWithdrawal(memberId, participatingCrewTrips);
+        CrewMember member = findMember(memberId);
+        this.values.remove(member);
+    }
+
+    private void validatePossibleWithdrawal(UUID memberId, List<CrewTrip> crewTrips) {
+        if (isLeader(memberId)) {
+            throw new ImpossibleWithdrawCrewException("크루 리더는 탈퇴할 수 없습니다.");
+        }
+
+        if (!CollectionUtils.isEmpty(crewTrips)) {
+            validateParticipatingCrewTrips(crewTrips);
+        }
+    }
+
+    private void validateParticipatingCrewTrips(List<CrewTrip> crewTrips) {
+        boolean participatingExclusionCrewTrip = crewTrips.stream()
+                .anyMatch(CrewTrip::isImpossibleWithdrawal);
+        if (participatingExclusionCrewTrip) {
+            throw new ImpossibleWithdrawCrewException("참여 중인 크루 전용 여행이 있어 탈퇴할 수 없습니다.");
+        }
+    }
+
+    private CrewMember findMember(UUID memberId) {
+        return this.values.stream()
+                .filter(m -> memberId.equals(m.getMemberId()))
+                .findFirst()
+                .orElseThrow(() -> new InvalidValueException("크루 멤버가 아닙니다."));
     }
 }

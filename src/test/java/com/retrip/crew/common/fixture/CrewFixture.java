@@ -7,12 +7,14 @@ import com.retrip.crew.domain.entity.CrewMemberRole;
 import com.retrip.crew.domain.entity.CrewMembers;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public abstract class CrewFixture {
+    public static final UUID TRIP_ID = UUID.fromString("b56d1d03-894a-4fe5-afbe-19be496bc1b4");
     public static final UUID LEADER_ID = UUID.fromString("caec62d1-f29d-477d-9743-292f48cc66bb");
     public static final UUID MEMBER_ID = UUID.fromString("85e05380-3693-4f3f-b74b-203715d15df8");
     public static final UUID 정수_ID = UUID.fromString("a7f7215b-081a-42f4-b3e2-f06393de2f8b");
@@ -46,6 +48,25 @@ public abstract class CrewFixture {
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100,
                 leaderId);
+    }
+
+    public static Crew createCrewWithMutableMembers(UUID leaderId) {
+        Crew crew = Crew.create(
+                "속초 크루원 구함",
+                "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
+                100,
+                leaderId);
+        List<CrewMember> crewMemberList = new ArrayList<>(5);
+        crewMemberList.add(new CrewMember(crew, leaderId, CrewMemberRole.LEADER));
+        crewMemberList.add(new CrewMember(crew, 정수_ID, CrewMemberRole.PARTICIPANT));
+        crewMemberList.add(new CrewMember(crew, 홍석_ID, CrewMemberRole.PARTICIPANT));
+        crewMemberList.add(new CrewMember(crew, 준호_ID, CrewMemberRole.PARTICIPANT));
+        crewMemberList.add(new CrewMember(crew, 지수_ID, CrewMemberRole.PARTICIPANT));
+        crewMemberList.add(new CrewMember(crew, 혁진_ID, CrewMemberRole.PARTICIPANT));
+        CrewMembers crewMembers = new CrewMembers(crew, leaderId);
+        ReflectionTestUtils.setField(crewMembers, "values", crewMemberList);
+        ReflectionTestUtils.setField(crew, "crewMembers", crewMembers);
+        return crew;
     }
 
     public static Crew createCrewWithMembers(UUID leaderId) {
