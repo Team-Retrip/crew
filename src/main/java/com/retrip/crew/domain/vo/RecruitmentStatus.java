@@ -17,7 +17,7 @@ public enum RecruitmentStatus {
 
     public static RecruitmentStatus codeOf(String code) {
         return Arrays.stream(RecruitmentStatus.values())
-                .filter(tripStatus -> tripStatus.getCode().equals(code))
+                .filter(value -> value.getCode().equals(code))
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 코드입니다."));
     }
