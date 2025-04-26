@@ -1,10 +1,31 @@
 package com.retrip.crew.application.in;
 
+import static com.retrip.crew.common.fixture.CrewFixture.LEADER_ID;
+import static com.retrip.crew.common.fixture.CrewFixture.MEMBER_ID;
+import static com.retrip.crew.common.fixture.CrewFixture.createCrew;
+import static com.retrip.crew.common.fixture.CrewFixture.createCrewRequest;
+import static com.retrip.crew.common.fixture.CrewFixture.createCrewWithMembers;
+import static com.retrip.crew.common.fixture.CrewFixture.createMultipleCrews;
+import static com.retrip.crew.common.fixture.CrewFixture.정수_ID;
+import static com.retrip.crew.common.fixture.CrewFixture.준호_ID;
+import static com.retrip.crew.common.fixture.CrewFixture.지수_ID;
+import static com.retrip.crew.common.fixture.CrewFixture.혁진_ID;
+import static com.retrip.crew.common.fixture.CrewFixture.홍석_ID;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import com.retrip.crew.application.in.request.IntroductionCreateRequest;
+import com.retrip.crew.application.in.request.IntroductionDeleteRequest;
+import com.retrip.crew.application.in.request.IntroductionUpdateRequest;
 import com.retrip.crew.application.in.request.crew.CrewCreateRequest;
 import com.retrip.crew.application.in.request.crew.CrewOrder;
 import com.retrip.crew.application.in.request.crew.CrewUpdateRequest;
 import com.retrip.crew.application.in.request.demand.CreateDemandRequest;
 import com.retrip.crew.application.in.request.demand.DemandOrder;
+import com.retrip.crew.application.in.response.IntroductionCreateResponse;
+import com.retrip.crew.application.in.response.IntroductionDetailResponse;
 import com.retrip.crew.application.in.response.crew.CrewCreateResponse;
 import com.retrip.crew.application.in.response.crew.CrewDetailResponse;
 import com.retrip.crew.application.in.response.crew.CrewListResponse;
@@ -16,9 +37,14 @@ import com.retrip.crew.common.ServiceTest;
 import com.retrip.crew.domain.entity.Crew;
 import com.retrip.crew.domain.entity.CrewMemberRole;
 import com.retrip.crew.domain.entity.Demand;
+import com.retrip.crew.domain.entity.Introduction;
 import com.retrip.crew.domain.exception.DuplicateDemandException;
+import com.retrip.crew.domain.exception.common.InvalidAccessException;
 import com.retrip.crew.domain.vo.DemandStatus;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -26,14 +52,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.util.List;
-import java.util.UUID;
-
-import static com.retrip.crew.common.fixture.CrewFixture.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 class CrewServiceTest extends ServiceTest {
     @Test
@@ -221,5 +239,131 @@ class CrewServiceTest extends ServiceTest {
                 () -> assertThat(response.members().getFirst().roleCode()).isEqualTo(CrewMemberRole.LEADER.getCode()),
                 () -> assertThat(response.members().getFirst().memberId()).isEqualTo(MEMBER_ID)
         );
+    }
+
+    @Test
+    void 자기소개를_등록한다() {
+        // given
+        Crew crew = crewRepository.save(Crew.create(
+                "속초 크루원 구함",
+                "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
+                100,
+                MEMBER_ID
+        ));
+        IntroductionCreateRequest request = new IntroductionCreateRequest(MEMBER_ID, "정수의 자기소개!", "안녕하세요!");
+
+        // when
+        IntroductionCreateResponse response = crewService.createIntroduction(crew.getId(), request);
+
+        // then
+        assertThat(response.crewId()).isNotNull();
+    }
+
+    @Test
+    void 내가_작성한_자기소개를_수정할_수_있다() {
+        // given
+        Crew crew = Crew.create(
+                "속초 크루원 구함",
+                "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
+                100,
+                MEMBER_ID
+        );
+        Introduction introduction = Introduction.create(
+                MEMBER_ID,
+                "정수의 자기소개!",
+                "안녕하세요!",
+                crew
+        );
+        crew.addIntroduction(introduction);
+        Crew savedCrew = crewRepository.save(crew);
+
+        IntroductionUpdateRequest request = new IntroductionUpdateRequest(MEMBER_ID, "변경된 자기소개!", "안녕!");
+
+        // when
+        crewService.updateIntroduction(savedCrew.getId(), introduction.getId(), request);
+        Introduction result = crewService.findIntroductionByIdAndCrewId(introduction.getId(), savedCrew.getId());
+
+        // then
+        assertThat(result.getTitle()).isEqualTo("변경된 자기소개!");
+        assertThat(result.getContent()).isEqualTo("안녕!");
+    }
+
+    @Test
+    void 일반_멤버는_다른_멤버의_자기소개를_수정할_수_없다() {
+        // given
+        Crew crew = Crew.create(
+                "속초 크루원 구함",
+                "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
+                100,
+                MEMBER_ID
+        );
+        Introduction introduction = Introduction.create(
+                MEMBER_ID,
+                "정수의 자기소개!",
+                "안녕하세요!",
+                crew
+        );
+        crew.addIntroduction(introduction);
+        Crew savedCrew = crewRepository.save(crew);
+
+        UUID otherMemberId = UUID.randomUUID();
+        IntroductionUpdateRequest request = new IntroductionUpdateRequest(otherMemberId, "수정된 소개", "안");
+
+        // when & then
+        assertThrows(InvalidAccessException.class, () -> crewService.updateIntroduction(savedCrew.getId(), introduction.getId(), request));
+    }
+
+    @Test
+    void 리더가_자기소개를_삭제할_수_있다() {
+        // given
+        Crew crew = Crew.create(
+                "속초 크루원 구함",
+                "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
+                100,
+                MEMBER_ID
+        );
+        Introduction introduction = Introduction.create(
+                MEMBER_ID,
+                "정수의 자기소개!",
+                "안녕하세요!",
+                crew
+        );
+        crew.addIntroduction(introduction);
+        Crew savedCrew = crewRepository.save(crew);
+
+        IntroductionDeleteRequest request = new IntroductionDeleteRequest(MEMBER_ID);
+
+        // when
+        crewService.deleteIntroduction(savedCrew.getId(), introduction.getId(), request);
+
+        // then
+        assertThat(savedCrew.getIntroductions().getValues().isEmpty()).isTrue();
+    }
+
+    @Test
+    void 자기소개를_조회한다() {
+        // given
+        Crew crew = Crew.create(
+                "속초 크루원 구함",
+                "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
+                100,
+                MEMBER_ID
+        );
+        Introduction introduction = Introduction.create(
+                MEMBER_ID,
+                "정수의 자기소개!",
+                "안녕하세요!",
+                crew
+        );
+        crew.addIntroduction(introduction);
+        Crew savedCrew = crewRepository.save(crew);
+
+        // when
+        IntroductionDetailResponse response = crewService.getIntroduction(savedCrew.getId(), introduction.getId());
+
+        // then
+        assertThat(response.introductionId()).isEqualTo(introduction.getId());
+        assertThat(response.content()).isEqualTo("안녕하세요!");
+        assertThat(response.title()).isEqualTo("정수의 자기소개!");
     }
 }

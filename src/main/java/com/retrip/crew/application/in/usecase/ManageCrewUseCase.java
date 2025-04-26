@@ -11,4 +11,5 @@ public interface ManageCrewUseCase {
     CrewCreateResponse createCrew(CrewCreateRequest request);
 
     CrewUpdateResponse updateCrew(UUID crewId, CrewUpdateRequest request);
+
 }

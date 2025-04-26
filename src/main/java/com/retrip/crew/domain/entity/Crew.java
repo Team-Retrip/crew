@@ -2,12 +2,15 @@ package com.retrip.crew.domain.entity;
 
 import com.retrip.crew.domain.vo.CrewDescription;
 import com.retrip.crew.domain.vo.CrewTitle;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Version;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -67,6 +70,10 @@ public class Crew extends BaseEntity {
 
     public void stopRecruitment() {
         this.recruitment.stop();
+    }
+
+    public void addIntroduction(Introduction introduction){
+        this.introductions.addIntroduction(introduction);
     }
 
     public void update(CrewTitle title, CrewDescription description) {
