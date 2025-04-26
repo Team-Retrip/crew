@@ -1,23 +1,27 @@
 package com.retrip.crew.application.in;
 
-import com.retrip.crew.application.in.request.CreateDemandRequest;
 import com.retrip.crew.application.in.request.IntroductionCreateRequest;
-import com.retrip.crew.application.in.request.CrewCreateRequest;
-import com.retrip.crew.application.in.request.CrewOrder;
-import com.retrip.crew.application.in.request.CrewUpdateRequest;
 import com.retrip.crew.application.in.request.IntroductionDeleteRequest;
 import com.retrip.crew.application.in.request.IntroductionUpdateRequest;
-import com.retrip.crew.application.in.response.*;
 import com.retrip.crew.application.in.request.crew.CrewCreateRequest;
 import com.retrip.crew.application.in.request.crew.CrewOrder;
 import com.retrip.crew.application.in.request.crew.CrewUpdateRequest;
 import com.retrip.crew.application.in.request.demand.CreateDemandRequest;
 import com.retrip.crew.application.in.request.demand.DemandOrder;
+import com.retrip.crew.application.in.response.IntroductionCreateResponse;
+import com.retrip.crew.application.in.response.IntroductionDetailResponse;
+import com.retrip.crew.application.in.response.IntroductionListResponse;
+import com.retrip.crew.application.in.response.IntroductionUpdateResponse;
 import com.retrip.crew.application.in.response.crew.CrewCreateResponse;
 import com.retrip.crew.application.in.response.crew.CrewDetailResponse;
 import com.retrip.crew.application.in.response.crew.CrewListResponse;
 import com.retrip.crew.application.in.response.crew.CrewUpdateResponse;
-import com.retrip.crew.application.in.response.demand.*;
+import com.retrip.crew.application.in.response.demand.ApproveDemandResponse;
+import com.retrip.crew.application.in.response.demand.ChangeRecruitmentStatusResponse;
+import com.retrip.crew.application.in.response.demand.CreateDemandResponse;
+import com.retrip.crew.application.in.response.demand.CrewsOfDemandResponse;
+import com.retrip.crew.application.in.response.demand.DemandsResponse;
+import com.retrip.crew.application.in.response.demand.RejectDemandResponse;
 import com.retrip.crew.application.in.usecase.GetCrewUseCase;
 import com.retrip.crew.application.in.usecase.ManageCrewUseCase;
 import com.retrip.crew.application.in.usecase.ManageDemandUseCase;
@@ -40,19 +44,18 @@ import com.retrip.crew.domain.exception.common.BusinessException;
 import com.retrip.crew.domain.exception.common.EntityNotFoundException;
 import com.retrip.crew.domain.vo.CrewDescription;
 import com.retrip.crew.domain.vo.CrewTitle;
+import com.retrip.crew.domain.vo.DemandStatus;
 import com.retrip.crew.domain.vo.IntroductionContent;
 import com.retrip.crew.domain.vo.IntroductionTitle;
-import com.retrip.crew.domain.vo.DemandStatus;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
 import com.retrip.crew.infra.util.PaginationUtils;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -108,7 +111,7 @@ public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase,
     @Override
     public Page<DemandsResponse> getDemands(
             UUID crewId, UUID memberId, String status, Pageable pageable, DemandOrder order, String sort) {
-        Crew crew = findById(crewId);
+        Crew crew = findCrewById(crewId);
         throwIfNotLeader(crew, memberId, new NotCrewLeaderException());
         Page<Demand> demands = demandRepository.findByCrewIdAndStatus(
                 crewId, DemandStatus.valueOf(status), PaginationUtils.createPageRequest(pageable, order.getField(), sort));
@@ -118,7 +121,7 @@ public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase,
     @Override
     public Page<CrewsOfDemandResponse> getCrewsOfDemand(
             UUID crewId, UUID demandId, UUID memberId, Pageable pageable, CrewOrder order, String sort) {
-        Crew crew = findById(crewId);
+        Crew crew = findCrewById(crewId);
         throwIfNotLeader(crew, memberId, new NotCrewLeaderException());
         Demand demand = findDemandByIdAndCrewId(demandId, crewId);
         return crewQueryRepository.findAllContainsMember(pageable, demand.getMemberId());
@@ -180,7 +183,7 @@ public class CrewService implements ManageCrewUseCase, UpdateRecruitmentUseCase,
         Crew crew = findCrewById(crewId);
         Introduction introduction = request.to(crew);
         crew.addIntroduction(introduction);
-        return IntroductionCreateResponse.from(introduction);
+        return IntroductionCreateResponse.of(introduction);
     }
 
     @Override

@@ -16,7 +16,7 @@ public record IntroductionCreateResponse(
         @Schema(description = "자기소개 본문")
         String content
 ) {
-    public static IntroductionCreateResponse from(Introduction introduction){
+    public static IntroductionCreateResponse of(Introduction introduction){
         return new IntroductionCreateResponse(
                 introduction.getCrew().getId(),
                 introduction.getId(),

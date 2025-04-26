@@ -1,40 +1,40 @@
 package com.retrip.crew.infra.adapter.in.presentation.rest;
 
-import com.retrip.crew.application.in.request.CreateDemandRequest;
 import com.retrip.crew.application.in.request.IntroductionCreateRequest;
-import com.retrip.crew.application.in.request.CrewCreateRequest;
-import com.retrip.crew.application.in.request.CrewOrder;
-import com.retrip.crew.application.in.request.CrewUpdateRequest;
 import com.retrip.crew.application.in.request.IntroductionDeleteRequest;
 import com.retrip.crew.application.in.request.IntroductionUpdateRequest;
-import com.retrip.crew.application.in.response.*;
 import com.retrip.crew.application.in.request.crew.CrewCreateRequest;
 import com.retrip.crew.application.in.request.crew.CrewOrder;
 import com.retrip.crew.application.in.request.crew.CrewUpdateRequest;
-import com.retrip.crew.application.in.request.demand.CreateDemandRequest;
-import com.retrip.crew.application.in.request.demand.DemandOrder;
+import com.retrip.crew.application.in.response.IntroductionCreateResponse;
+import com.retrip.crew.application.in.response.IntroductionDetailResponse;
+import com.retrip.crew.application.in.response.IntroductionListResponse;
+import com.retrip.crew.application.in.response.IntroductionUpdateResponse;
 import com.retrip.crew.application.in.response.crew.CrewCreateResponse;
 import com.retrip.crew.application.in.response.crew.CrewDetailResponse;
 import com.retrip.crew.application.in.response.crew.CrewListResponse;
 import com.retrip.crew.application.in.response.crew.CrewUpdateResponse;
-import com.retrip.crew.application.in.response.demand.*;
 import com.retrip.crew.application.in.usecase.GetCrewUseCase;
 import com.retrip.crew.application.in.usecase.ManageCrewUseCase;
-import com.retrip.crew.application.in.usecase.ManageDemandUseCase;
 import com.retrip.crew.application.in.usecase.ManageIntroductionUseCase;
-import com.retrip.crew.application.in.usecase.UpdateRecruitmentUseCase;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ApiResponse;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RequestMapping("/crews")
@@ -58,29 +58,6 @@ public class CrewController {
             @PathVariable UUID crewId, @RequestBody CrewUpdateRequest request) {
         CrewUpdateResponse crew = manageCrewUseCase.updateCrew(crewId, request);
         return ApiResponse.ok(crew);
-    }
-
-    @Schema(description = "크루 모집 시작")
-    @PutMapping("/{crewId}/recruitments/start")
-    public ApiResponse<ChangeRecruitmentStatusResponse> startRecruitment(@PathVariable final UUID crewId) {
-        ChangeRecruitmentStatusResponse recruitment = updateRecruitmentUseCase.startRecruitment(crewId);
-        return ApiResponse.ok(recruitment);
-    }
-
-    @Schema(description = "크루 모집 중지")
-    @PutMapping("/{crewId}/recruitments/stop")
-    public ApiResponse<ChangeRecruitmentStatusResponse> stopRecruitment(@PathVariable final UUID crewId) {
-        ChangeRecruitmentStatusResponse recruitment = updateRecruitmentUseCase.stopRecruitment(crewId);
-        return ApiResponse.ok(recruitment);
-    }
-
-    @Schema(description = "크루 참여 요청")
-    @PostMapping("/{crewId}/demands")
-    public ApiResponse<CreateDemandResponse> createDemand(
-            @PathVariable final UUID crewId,
-            @RequestBody CreateDemandRequest request) {
-        CreateDemandResponse demand = manageDemandUseCase.createDemand(crewId, request);
-        return ApiResponse.created(demand);
     }
 
     @Schema(description = "크루 리스트 조회")

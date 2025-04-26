@@ -37,7 +37,7 @@ public class Introduction extends BaseEntity {
             name = "crew_id",
             nullable = false,
             columnDefinition = "varbinary(16)",
-            foreignKey = @ForeignKey(name = "fk_self_introduce_board_to_crew")
+            foreignKey = @ForeignKey(name = "fk_introduction_to_crew")
     )
     private Crew crew;
 
