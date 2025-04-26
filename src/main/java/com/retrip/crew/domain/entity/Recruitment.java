@@ -1,8 +1,12 @@
 package com.retrip.crew.domain.entity;
 
-import com.retrip.crew.domain.exception.common.IllegalStateException;
+import com.retrip.crew.domain.exception.DuplicateDemandException;
+import com.retrip.crew.domain.exception.IllegalDemandStateException;
+import com.retrip.crew.domain.exception.UnableToStartRecruitmentException;
+import com.retrip.crew.domain.exception.common.InvalidValueException;
 import com.retrip.crew.domain.vo.RecruitmentStatus;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
@@ -11,6 +15,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.retrip.crew.domain.vo.RecruitmentStatus.RECRUITING;
@@ -21,6 +26,8 @@ import static com.retrip.crew.domain.vo.RecruitmentStatus.STOPPED;
 @Embeddable
 public class Recruitment {
     private int maxMembers;
+
+    @Column(name = "recruitment_status")
     private RecruitmentStatus status;
 
     @OneToMany(mappedBy = "crew", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -34,7 +41,7 @@ public class Recruitment {
     public void start(int membersSize) {
         if (isRecruitmentComplete(membersSize)) {
             stop();
-            throw new IllegalStateException("최대 인원을 모두 모집 완료하여 더 이상 멤버를 모집할 수 없습니다.");
+            throw new UnableToStartRecruitmentException("최대 인원을 모두 모집 완료하여 더 이상 멤버를 모집할 수 없습니다.");
         }
         this.status = RECRUITING;
     }
@@ -44,7 +51,7 @@ public class Recruitment {
     }
 
     private boolean isRecruitmentComplete(int membersSize) {
-        return this.maxMembers == membersSize;
+        return this.maxMembers <= membersSize;
     }
 
     public void updateMaxMembers(int maxMembers) {
@@ -53,7 +60,12 @@ public class Recruitment {
 
     public Demand addDemand(UUID memberId, Crew crew) {
         if (isDuplicate(memberId)) {
-            throw new IllegalStateException("이미 요청한 사용자는 다시 요청할 수 없습니다.");
+            throw new DuplicateDemandException();
+        }
+        Optional<Demand> reDemand = findReDemand(memberId);
+        if (reDemand.isPresent()) {
+            reDemand.get().restore();
+            return reDemand.get();
         }
         Demand demand = new Demand(memberId, crew);
         demands.add(demand);
@@ -62,7 +74,48 @@ public class Recruitment {
 
     private boolean isDuplicate(UUID memberId) {
         return demands.stream()
-                .map(Demand::getMemberId)
-                .anyMatch(id -> id.equals(memberId));
+                .anyMatch(d -> d.isEqualTo(memberId) && !d.isCanceled());
+    }
+
+    private Optional<Demand> findReDemand(UUID memberId) {
+        return demands.stream()
+                .filter(d -> isReDemand(memberId, d))
+                .findFirst();
+    }
+
+    private static boolean isReDemand(UUID memberId, Demand demand) {
+        return demand.isEqualTo(memberId)
+                && demand.isCanceled();
+    }
+
+    public void cancelDemand(Demand demand) {
+        Demand find = findDemand(demand);
+        throwIfNotPending(find);
+        find.cancel();
+    }
+
+    public void approveDemand(Demand demand) {
+        Demand find = findDemand(demand);
+        throwIfNotPending(find);
+        find.approve();
+    }
+
+    public void rejectDemand(Demand demand) {
+        Demand find = findDemand(demand);
+        throwIfNotPending(find);
+        find.reject();
+    }
+
+    private static void throwIfNotPending(Demand find) {
+        if (find.isNotPending()) {
+            throw new IllegalDemandStateException("참여 요청의 상태가 대기중이 아닙니다.");
+        }
+    }
+
+    private Demand findDemand(Demand demand) {
+        return demands.stream()
+                .filter(d -> d.equals(demand))
+                .findFirst()
+                .orElseThrow(() -> new InvalidValueException("참여 요청을 찾을 수 없습니다."));
     }
 }

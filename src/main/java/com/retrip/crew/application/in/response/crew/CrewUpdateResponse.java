@@ -1,4 +1,4 @@
-package com.retrip.crew.application.in.response;
+package com.retrip.crew.application.in.response.crew;
 
 import com.retrip.crew.domain.entity.Crew;
 import com.retrip.crew.domain.vo.RecruitmentStatus;
@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.UUID;
 
+@Schema(description = "크루 정보 변경 Response")
 public record CrewUpdateResponse(
         @Schema(description = "크루 ID")
         UUID id,

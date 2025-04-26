@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -39,7 +38,7 @@ public class CrewMember extends BaseEntity {
     }
 
     public boolean isLeader() {
-        return crewMemberRole == CrewMemberRole.LEADER;
+        return CrewMemberRole.isLeaderRole(this.crewMemberRole);
     }
 
     public boolean isCreatedByMe(UUID postCreatedBy) {

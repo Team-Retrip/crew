@@ -1,9 +1,9 @@
 package com.retrip.crew.application.in.usecase;
 
-import com.retrip.crew.application.in.request.CrewCreateRequest;
-import com.retrip.crew.application.in.request.CrewUpdateRequest;
-import com.retrip.crew.application.in.response.CrewCreateResponse;
-import com.retrip.crew.application.in.response.CrewUpdateResponse;
+import com.retrip.crew.application.in.request.crew.CrewCreateRequest;
+import com.retrip.crew.application.in.request.crew.CrewUpdateRequest;
+import com.retrip.crew.application.in.response.crew.CrewCreateResponse;
+import com.retrip.crew.application.in.response.crew.CrewUpdateResponse;
 
 import com.retrip.crew.domain.entity.Crew;
 
@@ -13,4 +13,5 @@ public interface ManageCrewUseCase {
     CrewCreateResponse createCrew(CrewCreateRequest request);
 
     CrewUpdateResponse updateCrew(UUID crewId, CrewUpdateRequest request);
+
 }
