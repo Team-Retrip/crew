@@ -20,7 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/crews")
 @RestController
-@Tag(name = "Crew", description = "크루 참여 모집 서비스")
+@Tag(name = "Recruitment", description = "크루 참여 모집 서비스")
 public class DemandController {
     private final UpdateRecruitmentUseCase updateRecruitmentUseCase;
     private final ManageDemandUseCase manageDemandUseCase;

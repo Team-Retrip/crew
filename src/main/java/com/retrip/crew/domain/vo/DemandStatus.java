@@ -18,7 +18,7 @@ public enum DemandStatus {
 
     public static DemandStatus codeOf(String code) {
         return Arrays.stream(DemandStatus.values())
-                .filter(participantStatus -> participantStatus.getCode().equals(code))
+                .filter(value -> value.getCode().equals(code))
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 코드입니다."));
     }

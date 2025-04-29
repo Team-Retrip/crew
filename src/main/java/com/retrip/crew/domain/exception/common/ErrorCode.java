@@ -20,6 +20,7 @@ public enum ErrorCode {
     ILLEGAL_DEMAND_STATE(BAD_REQUEST, "Crew-004", "이미 크루 참여를 요청한 사용자는 다시 요청할 수 없습니다."),
     INTRODUCTION_NOT_FOUND(BAD_REQUEST, "Crew-005", "크루 자기소개 엔티티를 찾을 수 없습니다."),
     INVALID_ACCESS(FORBIDDEN, "Crew-006","접근 권한이 존재하지 않습니다."),
+    IMPOSSIBLE_WITHDRAW_CREW(FORBIDDEN, "Crew-007","크루에서 탈퇴할 수 없습니다."),
     ;
 
     private final HttpStatus status;
