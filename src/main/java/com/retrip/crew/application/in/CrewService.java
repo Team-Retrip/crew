@@ -3,26 +3,17 @@ package com.retrip.crew.application.in;
 import com.retrip.crew.application.in.request.IntroductionCreateRequest;
 import com.retrip.crew.application.in.request.IntroductionDeleteRequest;
 import com.retrip.crew.application.in.request.IntroductionUpdateRequest;
-import com.retrip.crew.application.in.request.crew.CrewCreateRequest;
-import com.retrip.crew.application.in.request.crew.CrewOrder;
-import com.retrip.crew.application.in.request.crew.CrewUpdateRequest;
-import com.retrip.crew.application.in.request.crew.CrewWithdrawalRequest;
+import com.retrip.crew.application.in.request.crew.*;
 import com.retrip.crew.application.in.response.IntroductionCreateResponse;
 import com.retrip.crew.application.in.response.IntroductionDetailResponse;
 import com.retrip.crew.application.in.response.IntroductionListResponse;
 import com.retrip.crew.application.in.response.IntroductionUpdateResponse;
-import com.retrip.crew.application.in.response.crew.CrewCreateResponse;
-import com.retrip.crew.application.in.response.crew.CrewDetailResponse;
-import com.retrip.crew.application.in.response.crew.CrewListResponse;
-import com.retrip.crew.application.in.response.crew.CrewUpdateResponse;
+import com.retrip.crew.application.in.response.crew.*;
 import com.retrip.crew.application.in.usecase.GetCrewUseCase;
 import com.retrip.crew.application.in.usecase.ManageCrewUseCase;
 import com.retrip.crew.application.in.usecase.ManageIntroductionUseCase;
 import com.retrip.crew.application.out.repository.*;
-import com.retrip.crew.domain.entity.Crew;
-import com.retrip.crew.domain.entity.CrewMembers;
-import com.retrip.crew.domain.entity.Introduction;
-import com.retrip.crew.domain.entity.Recruitment;
+import com.retrip.crew.domain.entity.*;
 import com.retrip.crew.domain.exception.CrewNotFoundException;
 import com.retrip.crew.domain.exception.IntroductionNotFoundException;
 import com.retrip.crew.domain.vo.CrewDescription;
@@ -144,5 +135,13 @@ public class CrewService implements ManageCrewUseCase, GetCrewUseCase, ManageInt
         Crew crew = findCrewById(crewId);
         CrewMembers crewMembers = crew.getCrewMembers();
         crewMembers.withdraw(request.memberId(), request.participatingCrewTrips());
+    }
+
+    @Override
+    public CrewLeaderDelegateResponse delegateCrewLeader(UUID crewId, CrewLeaderDelegateRequest request) {
+        Crew crew = findCrewById(crewId);
+        CrewMembers crewMembers = crew.getCrewMembers();
+        CrewMember newLeader = crewMembers.delegateLeader(request.leaderId(), request.newLeaderId());
+        return CrewLeaderDelegateResponse.of(newLeader);
     }
 }

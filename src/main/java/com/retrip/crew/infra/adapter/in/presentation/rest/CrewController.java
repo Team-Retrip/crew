@@ -3,18 +3,12 @@ package com.retrip.crew.infra.adapter.in.presentation.rest;
 import com.retrip.crew.application.in.request.IntroductionCreateRequest;
 import com.retrip.crew.application.in.request.IntroductionDeleteRequest;
 import com.retrip.crew.application.in.request.IntroductionUpdateRequest;
-import com.retrip.crew.application.in.request.crew.CrewCreateRequest;
-import com.retrip.crew.application.in.request.crew.CrewOrder;
-import com.retrip.crew.application.in.request.crew.CrewUpdateRequest;
-import com.retrip.crew.application.in.request.crew.CrewWithdrawalRequest;
+import com.retrip.crew.application.in.request.crew.*;
 import com.retrip.crew.application.in.response.IntroductionCreateResponse;
 import com.retrip.crew.application.in.response.IntroductionDetailResponse;
 import com.retrip.crew.application.in.response.IntroductionListResponse;
 import com.retrip.crew.application.in.response.IntroductionUpdateResponse;
-import com.retrip.crew.application.in.response.crew.CrewCreateResponse;
-import com.retrip.crew.application.in.response.crew.CrewDetailResponse;
-import com.retrip.crew.application.in.response.crew.CrewListResponse;
-import com.retrip.crew.application.in.response.crew.CrewUpdateResponse;
+import com.retrip.crew.application.in.response.crew.*;
 import com.retrip.crew.application.in.usecase.GetCrewUseCase;
 import com.retrip.crew.application.in.usecase.ManageCrewUseCase;
 import com.retrip.crew.application.in.usecase.ManageIntroductionUseCase;
@@ -131,5 +125,14 @@ public class CrewController {
             @RequestBody CrewWithdrawalRequest request) {
         manageCrewUseCase.withdrawCrew(crewId, request);
         return ApiResponse.noContent();
+    }
+
+    @Schema(description = "크루 리더 위임")
+    @PutMapping("/{crewId}/members/delegate")
+    public ApiResponse<CrewLeaderDelegateResponse> delegateCrewLeader(
+            @PathVariable final UUID crewId,
+            @RequestBody CrewLeaderDelegateRequest request) {
+        CrewLeaderDelegateResponse response = manageCrewUseCase.delegateCrewLeader(crewId, request);
+        return ApiResponse.ok(response);
     }
 }
