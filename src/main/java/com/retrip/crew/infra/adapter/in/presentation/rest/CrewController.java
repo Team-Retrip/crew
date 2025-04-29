@@ -96,12 +96,12 @@ public class CrewController {
 
     @Schema(description = "크루 자기소개 삭제")
     @DeleteMapping("/{crewId}/introductions/{introductionId}")
-    public ApiResponse<IntroductionCreateResponse> deleteIntroduction(
+    public ApiResponse<Void> deleteIntroduction(
             @PathVariable("crewId") final UUID crewId,
             @PathVariable("introductionId") final UUID introductionId,
             @RequestBody IntroductionDeleteRequest request) {
         manageIntroductionUseCase.deleteIntroduction(crewId, introductionId, request);
-        return ApiResponse.created(null);
+        return ApiResponse.noContent();
     }
 
     @Schema(description = "크루 자기소개 상세 조회")
