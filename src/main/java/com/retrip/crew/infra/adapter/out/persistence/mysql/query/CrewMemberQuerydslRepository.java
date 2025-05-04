@@ -18,11 +18,11 @@ public class CrewMemberQuerydslRepository implements CrewMemberQueryRepository {
     private final JPAQueryFactory query;
 
     @Override
-    public Optional<CrewMember> findCrewMemberByUserId(UUID crewId, UUID userId) {
+    public Optional<CrewMember> findCrewMemberByMemberId(UUID crewId, UUID memberId) {
         return Optional.ofNullable(
                 query.selectFrom(crewMember)
                         .join(crew)
-                        .on(crewMember.crew.id.eq(crewId), crewMember.memberId.eq(userId))
+                        .on(crewMember.crew.id.eq(crewId), crewMember.memberId.eq(memberId))
                         .fetchOne());
     }
 }

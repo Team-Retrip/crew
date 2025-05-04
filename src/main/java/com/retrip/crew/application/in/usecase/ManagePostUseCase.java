@@ -19,8 +19,5 @@ public interface ManagePostUseCase {
 
     UpdatePostResponse updatePost(UUID crewId, UUID postId, UpdatePostRequest request);
 
-    DeletePostResponse deletePost(UUID crewId, UUID postId, UUID userId);
-
-
-
+    void deletePost(UUID crewId, UUID postId, UUID memberId);
 }

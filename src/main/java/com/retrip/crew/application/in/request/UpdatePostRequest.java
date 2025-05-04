@@ -21,7 +21,7 @@ public record UpdatePostRequest(
 
         @Schema(description = "수정자")
         @NotNull
-        UUID userId
+        UUID memberId
 ) {
 
 }

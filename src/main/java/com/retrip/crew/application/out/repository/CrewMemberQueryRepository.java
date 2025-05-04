@@ -6,5 +6,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CrewMemberQueryRepository {
-    Optional<CrewMember> findCrewMemberByUserId(UUID crewId, UUID userId);
+    Optional<CrewMember> findCrewMemberByMemberId(UUID crewId, UUID userId);
 }

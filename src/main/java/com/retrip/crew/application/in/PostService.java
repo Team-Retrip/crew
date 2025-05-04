@@ -17,11 +17,12 @@ import com.retrip.crew.domain.entity.CrewMember;
 import com.retrip.crew.domain.entity.Post;
 import com.retrip.crew.domain.exception.CrewMemberNotFoundException;
 
+import com.retrip.crew.domain.exception.CrewNotFoundException;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
 import com.retrip.crew.infra.util.PaginationUtils;
+
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -42,9 +43,9 @@ public class PostService implements ManagePostUseCase, GetPostUseCase {
         Crew crew =
                 crewQueryRepository
                         .findByIdWithPosts(crewId)
-                        .orElseThrow(CrewMemberNotFoundException::new);
+                        .orElseThrow(CrewNotFoundException::new);
         Post post = request.to(crew);
-        crew.addPost(post);
+        crew.getPosts().add(post);
         return CreatePostResponse.of(post);
     }
 
@@ -53,25 +54,24 @@ public class PostService implements ManagePostUseCase, GetPostUseCase {
         Crew crew =
                 crewQueryRepository
                         .findByIdWithPosts(crewId)
-                        .orElseThrow(CrewMemberNotFoundException::new);
-        Post post = crew.updatePost(postId, request.title(), request.content(), request.userId());
+                        .orElseThrow(CrewNotFoundException::new);
+        Post post = crew.getPosts().updatePost(postId, request.title(), request.content(), request.memberId());
         return UpdatePostResponse.of(post);
     }
 
     @Override
-    public DeletePostResponse deletePost(UUID crewId, UUID postId, UUID userId) {
+    public void deletePost(UUID crewId, UUID postId, UUID memberId) {
         Crew crew =
                 crewQueryRepository
                         .findByIdWithPosts(crewId)
-                        .orElseThrow(CrewMemberNotFoundException::new);
-        CrewMember crewMember = findCrewMemberByUserId(crewId, userId);
-        UUID deleteId = crew.deletePost(postId, crewMember);
-        return DeletePostResponse.of(deleteId);
+                        .orElseThrow(CrewNotFoundException::new);
+        CrewMember crewMember = findCrewMemberByMemberId(crewId, memberId);
+        crew.getPosts().deletePost(postId, crewMember);
     }
 
-    private CrewMember findCrewMemberByUserId(UUID crewId, UUID userId) {
+    private CrewMember findCrewMemberByMemberId(UUID crewId, UUID memberId) {
         return crewMemberQueryRepository
-                .findCrewMemberByUserId(crewId, userId)
+                .findCrewMemberByMemberId(crewId, memberId)
                 .orElseThrow(CrewMemberNotFoundException::new);
     }
 

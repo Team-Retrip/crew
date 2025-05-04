@@ -29,7 +29,7 @@ public class PostController {
     private final GetPostUseCase getPostUseCase;
 
     @PostMapping("/{crewId}/posts")
-    @Schema(description = "크루 자유 게시판 생성")
+    @Schema(description = "자유 게시글 생성")
     public ApiResponse<CreatePostResponse> createPost(
             @PathVariable UUID crewId, @RequestBody CreatePostRequest request) {
         CreatePostResponse post = managePostUseCase.createPost(crewId, request);
@@ -37,7 +37,7 @@ public class PostController {
     }
 
     @PutMapping("/{crewId}/posts/{postId}")
-    @Schema(description = "크루 자유 게시판 수정")
+    @Schema(description = "자유 게시글 수정")
     public ApiResponse<UpdatePostResponse> updatePost(
             @PathVariable UUID crewId,
             @PathVariable UUID postId,
@@ -47,11 +47,11 @@ public class PostController {
     }
 
     @DeleteMapping("/{crewId}/posts/{postId}")
-    @Schema(description = "크루 자유 게시판 삭제")
-    public ApiResponse<DeletePostResponse> deletePost(
-            @PathVariable UUID crewId, @PathVariable UUID postId, @RequestParam UUID userId) {
-        DeletePostResponse post = managePostUseCase.deletePost(crewId, postId, userId);
-        return ApiResponse.created(post);
+    @Schema(description = "자유 게시글 삭제")
+    public ApiResponse<Void> deletePost(
+            @PathVariable UUID crewId, @PathVariable UUID postId, @RequestParam UUID memberId) {
+        managePostUseCase.deletePost(crewId, postId, memberId);
+        return ApiResponse.noContent();
     }
 
     @GetMapping("/{crewId}/posts")

@@ -1,11 +1,5 @@
 package com.retrip.crew.infra.adapter.out.persistence.mysql.query;
 
-import static com.querydsl.jpa.JPAExpressions.select;
-import static com.retrip.crew.domain.entity.QCrew.crew;
-import static com.retrip.crew.domain.entity.QCrewMember.crewMember;
-import static com.retrip.crew.domain.entity.QPost.post;
-import static com.retrip.crew.infra.util.PaginationUtils.checkEndPage;
-
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -23,9 +17,6 @@ import com.retrip.crew.application.out.repository.CrewQueryRepository;
 import com.retrip.crew.domain.entity.Crew;
 import com.retrip.crew.domain.entity.CrewMemberRole;
 import com.retrip.crew.domain.entity.QCrewMember;
-
-import java.util.UUID;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +27,13 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+
+import static com.querydsl.jpa.JPAExpressions.select;
+import static com.retrip.crew.domain.entity.QCrew.crew;
+import static com.retrip.crew.domain.entity.QCrewMember.crewMember;
+import static com.retrip.crew.domain.entity.QPost.post;
+import static com.retrip.crew.infra.util.PaginationUtils.checkEndPage;
 
 @Repository
 @RequiredArgsConstructor
@@ -78,7 +76,11 @@ public class CrewQuerydslRepository implements CrewQueryRepository {
 
     @Override
     public Long getCrewCount(String keyword) {
-        return query.select(crew.count()).from(crew).where(crewTitleContains(keyword)).fetchOne();
+        return query
+                .select(crew.count())
+                .from(crew)
+                .where(crewTitleContains(keyword))
+                .fetchOne();
     }
 
     @Override

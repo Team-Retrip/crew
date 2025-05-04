@@ -96,16 +96,4 @@ public class Crew extends BaseEntity {
         recruitment.approveDemand(demand);
         crewMembers.addMember(demand, this);
     }
-
-    public void addPost(Post post) {
-        this.posts.getValues().add(post);
-    }
-
-    public Post updatePost(UUID postId, String title, String content, UUID userId) {
-        return this.posts.updatePost(postId, title, content, userId);
-    }
-
-    public UUID deletePost(UUID postId, CrewMember crewMember) {
-        return this.posts.deletePost(postId, crewMember);
-    }
 }

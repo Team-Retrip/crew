@@ -1,25 +1,22 @@
 package com.retrip.crew.application.in;
 
-import static com.retrip.crew.common.fixture.PostFixture.MEMBER_ID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import com.retrip.crew.application.in.factory.BasePostServiceTest;
 import com.retrip.crew.application.in.request.CreatePostRequest;
 import com.retrip.crew.application.in.request.PostOrder;
 import com.retrip.crew.application.in.request.UpdatePostRequest;
 import com.retrip.crew.application.in.response.CreatePostResponse;
-import com.retrip.crew.application.in.response.DeletePostResponse;
 import com.retrip.crew.application.in.response.PostResponse;
 import com.retrip.crew.application.in.response.UpdatePostResponse;
 import com.retrip.crew.common.fixture.PostFixture;
 import com.retrip.crew.domain.entity.Crew;
-
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+
+import static com.retrip.crew.common.fixture.PostFixture.MEMBER_ID;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class PostServiceTest extends BasePostServiceTest {
 
@@ -132,10 +129,10 @@ class PostServiceTest extends BasePostServiceTest {
         ;
 
         // when
-        DeletePostResponse response =
-                postService.deletePost(crew.getId(), createPostResponse.id(), MEMBER_ID);
 
         // then
-        assertThat(response.id()).isNotNull();
+        assertDoesNotThrow(
+                () -> postService.deletePost(crew.getId(), createPostResponse.id(), MEMBER_ID)
+        );
     }
 }

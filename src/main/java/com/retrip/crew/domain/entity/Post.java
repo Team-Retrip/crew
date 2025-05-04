@@ -1,6 +1,6 @@
 package com.retrip.crew.domain.entity;
 
-import com.retrip.crew.domain.exception.PostUpdateException;
+import com.retrip.crew.domain.exception.PostUpdateFailedException;
 import com.retrip.crew.domain.vo.PostContent;
 import com.retrip.crew.domain.vo.PostTitle;
 
@@ -20,16 +20,18 @@ public class Post extends BaseEntity {
     @Column(columnDefinition = "varbinary(16)")
     private UUID id;
 
-    @Embedded private PostTitle title;
+    @Embedded
+    private PostTitle title;
 
-    @Embedded private PostContent content;
+    @Embedded
+    private PostContent content;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "crew_id",
             nullable = false,
             columnDefinition = "varbinary(16)",
-            foreignKey = @ForeignKey(name = "fk_free_board_to_crew"))
+            foreignKey = @ForeignKey(name = "fk_post_to_crew"))
     private Crew crew;
 
     private Post(String title, String content, Crew crew) {
@@ -43,15 +45,15 @@ public class Post extends BaseEntity {
         return new Post(title, content, crew);
     }
 
-    public void update(String title, String content, UUID userId) {
-        // isUpdatable(this.getCreatedBy(), userId);
+    public void update(String title, String content, UUID memberId) {
+        // isUpdatable(this.getCreatedBy(), memberId);
         this.title = new PostTitle(title);
         this.content = new PostContent(content);
     }
 
     private void isUpdatable(UUID createBy, UUID updateBy) {
         if (createBy != updateBy) {
-            throw new PostUpdateException();
+            throw new PostUpdateFailedException();
         }
     }
 
