@@ -2,6 +2,7 @@ package com.retrip.crew.domain.entity;
 
 import com.retrip.crew.domain.CrewTrip;
 import com.retrip.crew.domain.exception.ImpossibleWithdrawCrewException;
+import com.retrip.crew.domain.exception.NotCrewLeaderException;
 import com.retrip.crew.domain.exception.common.IllegalStateException;
 import com.retrip.crew.domain.exception.common.InvalidValueException;
 import jakarta.persistence.CascadeType;
@@ -33,9 +34,9 @@ public class CrewMembers {
 
     public CrewMember getLeader() {
         return this.values.stream()
-                .filter(it -> it.getCrewMemberRole() == CrewMemberRole.LEADER)
+                .filter(CrewMember::isLeader)
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new InvalidValueException("크루 리더를 찾을 수 없습니다."));
     }
 
     public int getSize() {
@@ -89,5 +90,21 @@ public class CrewMembers {
                 .filter(m -> memberId.equals(m.getMemberId()))
                 .findFirst()
                 .orElseThrow(() -> new InvalidValueException("크루 멤버가 아닙니다."));
+    }
+
+    public CrewMember delegateLeader(UUID leaderId, UUID newLeaderId) {
+        CrewMember leader = findMember(leaderId);
+        CrewMember newLeader = findMember(newLeaderId);
+        validatePossibleDelegate(leader);
+
+        leader.changeRole(CrewMemberRole.PARTICIPANT);
+        newLeader.changeRole(CrewMemberRole.LEADER);
+        return newLeader;
+    }
+
+    private void validatePossibleDelegate(CrewMember leader) {
+        if (!leader.isLeader()) {
+            throw new NotCrewLeaderException();
+        }
     }
 }

@@ -40,4 +40,8 @@ public class CrewMember extends BaseEntity {
     public boolean isLeader() {
         return CrewMemberRole.isLeaderRole(this.crewMemberRole);
     }
+
+    public void changeRole(CrewMemberRole role) {
+        this.crewMemberRole = role;
+    }
 }

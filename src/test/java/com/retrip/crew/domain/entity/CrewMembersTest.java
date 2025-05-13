@@ -134,4 +134,19 @@ class CrewMembersTest {
         // then
         assertThat(crewMembers.getValues().contains(member)).isFalse();
     }
+
+    @Test
+    void 크루_리더를_위임한다() {
+        // given
+        Crew crew = createCrewWithMembers(LEADER_ID);
+        CrewMember leader = crew.getCrewMembers().getLeader();
+
+        // when
+        CrewMember newLeader = crew.getCrewMembers().delegateLeader(LEADER_ID, 홍석_ID);
+
+        // then
+        assertThat(newLeader.getMemberId()).isEqualTo(홍석_ID);
+        assertThat(newLeader.getCrewMemberRole()).isEqualTo(CrewMemberRole.LEADER);
+        assertThat(leader.getCrewMemberRole()).isEqualTo(CrewMemberRole.PARTICIPANT);
+    }
 }
