@@ -44,4 +44,8 @@ public class CrewMember extends BaseEntity {
     public void changeRole(CrewMemberRole role) {
         this.crewMemberRole = role;
     }
+
+    public boolean isCreatedByMe(UUID postCreatedBy) {
+        return postCreatedBy == memberId;
+    }
 }

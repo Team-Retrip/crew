@@ -2,15 +2,18 @@ package com.retrip.crew.domain.entity;
 
 import com.retrip.crew.domain.vo.CrewDescription;
 import com.retrip.crew.domain.vo.CrewTitle;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Version;
-import java.util.UUID;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.UUID;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -20,29 +23,21 @@ public class Crew extends BaseEntity {
     @Column(columnDefinition = "varbinary(16)")
     private UUID id;
 
-    @Version
-    private long version;
+    @Version private long version;
 
-    @Embedded
-    private CrewTitle title;
+    @Embedded private CrewTitle title;
 
-    @Embedded
-    private CrewDescription description;
+    @Embedded private CrewDescription description;
 
-    @Embedded
-    private CrewMembers crewMembers;
+    @Embedded private CrewMembers crewMembers;
 
-    @Embedded
-    private Posts posts;
+    @Embedded private Posts posts;
 
-    @Embedded
-    private Announcements announcements;
+    @Embedded private Announcements announcements;
 
-    @Embedded
-    private Introductions introductions;
+    @Embedded private Introductions introductions;
 
-    @Embedded
-    private Recruitment recruitment;
+    @Embedded private Recruitment recruitment;
 
     private Crew(String name, String description, int maxMembers, UUID leader) {
         this.id = UUID.randomUUID();
@@ -72,7 +67,7 @@ public class Crew extends BaseEntity {
         this.recruitment.stop();
     }
 
-    public void addIntroduction(Introduction introduction){
+    public void addIntroduction(Introduction introduction) {
         this.introductions.addIntroduction(introduction);
     }
 
@@ -85,7 +80,7 @@ public class Crew extends BaseEntity {
         return recruitment.addDemand(memberId, this);
     }
 
-    public String getDescription(){
+    public String getDescription() {
         return description.getValue();
     }
 

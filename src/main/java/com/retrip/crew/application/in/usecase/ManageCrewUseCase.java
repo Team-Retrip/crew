@@ -8,6 +8,8 @@ import com.retrip.crew.application.in.response.crew.CrewCreateResponse;
 import com.retrip.crew.application.in.response.crew.CrewLeaderDelegateResponse;
 import com.retrip.crew.application.in.response.crew.CrewUpdateResponse;
 
+import com.retrip.crew.domain.entity.Crew;
+
 import java.util.UUID;
 
 public interface ManageCrewUseCase {

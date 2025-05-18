@@ -1,11 +1,14 @@
 package com.retrip.crew.domain.entity;
 
+import com.retrip.crew.domain.exception.PostDeleteFailedException;
+import com.retrip.crew.domain.exception.PostNotFoundException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.OneToMany;
-import lombok.AccessLevel;
+
+import java.util.UUID;
+
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,5 +25,28 @@ public class Posts {
 
     private List<Post> createEmptyValues() {
         return new ArrayList<>();
+    }
+
+    public Post updatePost(UUID postId, String title, String content, UUID memberId) {
+        Post post = findPost(postId);
+        post.update(title, content, memberId);
+        return post;
+    }
+
+    public void deletePost(UUID postId, CrewMember crewMember) {
+        Post post = findPost(postId);
+        if (!post.isDeletable(crewMember)) {
+            throw new PostDeleteFailedException();
+        }
+        this.values.remove(post);
+    }
+
+    private Post findPost(UUID postId) {
+        return this.values.stream().filter(p -> p.getId().equals(postId)).findAny()
+                .orElseThrow(PostNotFoundException::new);
+    }
+
+    public void add(Post post) {
+        this.values.add(post);
     }
 }

@@ -14,6 +14,7 @@ import com.retrip.crew.application.in.request.crew.CrewOrder;
 import com.retrip.crew.application.in.response.crew.CrewListResponse;
 import com.retrip.crew.application.in.response.demand.CrewsOfDemandResponse;
 import com.retrip.crew.application.out.repository.CrewQueryRepository;
+import com.retrip.crew.domain.entity.Crew;
 import com.retrip.crew.domain.entity.CrewMemberRole;
 import com.retrip.crew.domain.entity.QCrewMember;
 import lombok.RequiredArgsConstructor;
@@ -25,11 +26,13 @@ import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.querydsl.jpa.JPAExpressions.select;
 import static com.retrip.crew.domain.entity.QCrew.crew;
 import static com.retrip.crew.domain.entity.QCrewMember.crewMember;
+import static com.retrip.crew.domain.entity.QPost.post;
 import static com.retrip.crew.infra.util.PaginationUtils.checkEndPage;
 
 @Repository
@@ -73,12 +76,20 @@ public class CrewQuerydslRepository implements CrewQueryRepository {
 
     @Override
     public Long getCrewCount(String keyword) {
-        return query.select(crew.count())
+        return query
+                .select(crew.count())
                 .from(crew)
-                .where(
-                        crewTitleContains(keyword)
-                )
+                .where(crewTitleContains(keyword))
                 .fetchOne();
+    }
+
+    @Override
+    public Optional<Crew> findByIdWithPosts(UUID id) {
+        return Optional.ofNullable(
+                query.selectFrom(crew)
+                        .leftJoin(crew.posts.values, post).fetchJoin()
+                        .where(crew.id.eq(crew.id))
+                        .fetchOne());
     }
 
     private BooleanExpression crewTitleContains(String title) {

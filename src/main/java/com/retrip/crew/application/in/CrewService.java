@@ -23,12 +23,11 @@ import com.retrip.crew.domain.vo.IntroductionTitle;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
 import com.retrip.crew.infra.util.PaginationUtils;
 import lombok.RequiredArgsConstructor;
+import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -60,8 +59,10 @@ public class CrewService implements ManageCrewUseCase, GetCrewUseCase, ManageInt
 
     @Override
     @Transactional(readOnly = true)
-    public ScrollPageResponse<CrewListResponse> getCrews(Pageable pageable, String keyword, CrewOrder order, String sort) {
-        Pageable orderPageable = PaginationUtils.createPageRequest(pageable, order.getField(), sort);
+    public ScrollPageResponse<CrewListResponse> getCrews(
+            Pageable pageable, String keyword, CrewOrder order, String sort) {
+        Pageable orderPageable =
+                PaginationUtils.createPageRequest(pageable, order.getField(), sort);
         Slice<CrewListResponse> result = crewQueryRepository.getCrews(orderPageable, keyword);
         Long totalCount = crewQueryRepository.getCrewCount(keyword);
         return ScrollPageResponse.of(totalCount, result.hasNext(), result.getContent());
