@@ -21,7 +21,7 @@ public class RecruitmentQuestions {
     private static final int MAX_QUESTIONS = 10;
 
     @BatchSize(size = 100)
-    @OneToMany(mappedBy = "crew", cascade = CascadeType.ALL, orphanRemoval = true)
+c    @OneToMany(mappedBy = "recruitment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RecruitmentQuestion> values = new ArrayList<>();
 
     public RecruitmentQuestions(List<String> values, Crew crew) {

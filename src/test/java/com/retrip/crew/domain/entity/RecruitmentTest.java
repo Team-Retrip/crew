@@ -12,7 +12,9 @@ class RecruitmentTest {
 
     @Test
     void 모집을_생성한다() {
-        assertThatCode(() -> new Recruitment(10, List.of("질문1", "질문2")))
+        Crew crew = new Crew();
+        RecruitmentQuestions questions = new RecruitmentQuestions(questions, crew);
+        assertThatCode(() -> new Recruitment(10, questions))
                 .doesNotThrowAnyException();
     }
 
