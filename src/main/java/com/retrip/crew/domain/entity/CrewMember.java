@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -36,5 +35,17 @@ public class CrewMember extends BaseEntity {
         this.crew = crew;
         this.memberId = memberId;
         this.crewMemberRole = CrewMemberRole.valueOf(crewMemberRole.name());
+    }
+
+    public boolean isLeader() {
+        return CrewMemberRole.isLeaderRole(this.crewMemberRole);
+    }
+
+    public void changeRole(CrewMemberRole role) {
+        this.crewMemberRole = role;
+    }
+
+    public boolean isCreatedByMe(UUID postCreatedBy) {
+        return postCreatedBy == memberId;
     }
 }

@@ -1,8 +1,13 @@
 package com.retrip.crew.common.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.retrip.crew.application.out.repository.CrewMemberQueryRepository;
+import com.retrip.crew.infra.adapter.out.persistence.mysql.query.CrewMemberQuerydslRepository;
 import com.retrip.crew.infra.adapter.out.persistence.mysql.query.CrewQuerydslRepository;
+import com.retrip.crew.infra.adapter.out.persistence.mysql.query.IntroductionQuerydslRepository;
+
 import jakarta.persistence.EntityManager;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -12,8 +17,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @TestConfiguration
 public class QuerydslConfig {
 
-    @Autowired
-    EntityManager entityManager;
+    @Autowired EntityManager entityManager;
 
     @Bean
     public JPAQueryFactory jpaQueryFactory() {
@@ -23,5 +27,16 @@ public class QuerydslConfig {
     @Bean
     public CrewQuerydslRepository crewQuerydslRepository(JPAQueryFactory jpaQueryFactory) {
         return new CrewQuerydslRepository(jpaQueryFactory);
+    }
+
+    @Bean
+    public CrewMemberQueryRepository crewMemberQueryRepository(JPAQueryFactory jpaQueryFactory) {
+        return new CrewMemberQuerydslRepository(jpaQueryFactory);
+    }
+
+    @Bean
+    public IntroductionQuerydslRepository introductionQuerydslRepository(
+            JPAQueryFactory jpaQueryFactory) {
+        return new IntroductionQuerydslRepository(jpaQueryFactory);
     }
 }

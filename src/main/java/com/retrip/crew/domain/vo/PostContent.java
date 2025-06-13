@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class PostContent {
-    private static final int CONTENT_LENGTH_LIMIT = 500;
+    private static final int CONTENT_LENGTH_LIMIT = 200;
 
     @Column(name = "content", nullable = false, length = CONTENT_LENGTH_LIMIT)
     private final String value;

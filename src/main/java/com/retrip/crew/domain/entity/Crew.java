@@ -2,12 +2,17 @@ package com.retrip.crew.domain.entity;
 
 import com.retrip.crew.domain.vo.CrewDescription;
 import com.retrip.crew.domain.vo.CrewTitle;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Version;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -18,48 +23,35 @@ public class Crew extends BaseEntity {
     @Column(columnDefinition = "varbinary(16)")
     private UUID id;
 
-    @Version
-    private long version;
+    @Version private long version;
 
-    @Embedded
-    private CrewTitle title;
+    @Embedded private CrewTitle title;
 
-    @Embedded
-    private CrewDescription description;
+    @Embedded private CrewDescription description;
 
+    @Embedded private CrewMembers crewMembers;
 
+    @Embedded private Posts posts;
 
-    @Embedded
-    private CrewMembers crewMembers;
+    @Embedded private Announcements announcements;
 
-    @Embedded
-    private Posts posts;
+    @Embedded private Introductions introductions;
 
-    @Embedded
-    private Announcements announcements;
+    @Embedded private Recruitment recruitment;
 
-    @Embedded
-    private Introductions introductions;
-
-    @Embedded
-    private Recruitment recruitment;
-
-    private Crew(String name, String description, int maxMembers, UUID leader,List<String> questions) {
+    private Crew(String name, String description, int maxMembers, UUID leader) {
         this.id = UUID.randomUUID();
         this.title = new CrewTitle(name);
         this.description = new CrewDescription(description);
-        this.recruitment = Recruitment.of(maxMembers,questions,this);
+        this.recruitment = new Recruitment(maxMembers);
         this.crewMembers = new CrewMembers(this, leader);
         this.posts = new Posts();
         this.announcements = new Announcements();
         this.introductions = new Introductions();
     }
 
-    public static Crew create(String title, String description, int maxMembers, UUID leader, List<String> questions) {
-        Crew crew =new Crew(title, description, maxMembers, leader, questions);
-        crew.recruitment = Recruitment.of(maxMembers, questions, crew);
-        return crew;
-
+    public static Crew create(String title, String description, int maxMembers, UUID leader) {
+        return new Crew(title, description, maxMembers, leader);
     }
 
     public CrewMember getLeader() {
@@ -75,6 +67,10 @@ public class Crew extends BaseEntity {
         this.recruitment.stop();
     }
 
+    public void addIntroduction(Introduction introduction) {
+        this.introductions.addIntroduction(introduction);
+    }
+
     public void update(CrewTitle title, CrewDescription description) {
         this.title = title;
         this.description = description;
@@ -84,10 +80,20 @@ public class Crew extends BaseEntity {
         return recruitment.addDemand(memberId, this);
     }
 
-    public String getDescription(){
+    public String getDescription() {
         return description.getValue();
     }
 
+    public void cancelDemand(Demand demand) {
+        recruitment.cancelDemand(demand);
+    }
 
+    public void rejectDemand(Demand demand) {
+        recruitment.rejectDemand(demand);
+    }
 
+    public void approveDemand(Demand demand) {
+        recruitment.approveDemand(demand);
+        crewMembers.addMember(demand, this);
+    }
 }
