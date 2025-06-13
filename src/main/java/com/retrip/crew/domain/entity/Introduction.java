@@ -11,7 +11,9 @@ import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+
 import java.util.UUID;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -41,7 +43,7 @@ public class Introduction extends BaseEntity {
     )
     private Crew crew;
 
-    public Introduction(UUID loginMemberId, String title, String content, Crew crew){
+    public Introduction(UUID loginMemberId, String title, String content, Crew crew) {
         this.id = UUID.randomUUID();
         this.memberId = loginMemberId;
         this.title = new IntroductionTitle(title);
@@ -53,11 +55,11 @@ public class Introduction extends BaseEntity {
         return new Introduction(loginMemberId, title, content, crew);
     }
 
-    public String getTitle(){
+    public String getTitle() {
         return title.getValue();
     }
 
-    public String getContent(){
+    public String getContent() {
         return content.getValue();
     }
 
@@ -67,23 +69,23 @@ public class Introduction extends BaseEntity {
         this.content = introductionContent;
     }
 
-    public void validateIntroductionOwner(UUID loginMemberId){
-        if(!isOwner(loginMemberId)){
+    public void validateIntroductionOwner(UUID loginMemberId) {
+        if (!isOwner(loginMemberId)) {
             throw new InvalidAccessException();
         }
     }
 
-    public void validateIntroductionOwnerAndLeader(UUID loginMemberId){
-        if(!isOwner(loginMemberId) || !isLeader(loginMemberId)){
+    public void validateIntroductionOwnerAndLeader(UUID loginMemberId) {
+        if (!isOwner(loginMemberId) || !isLeader(loginMemberId)) {
             throw new InvalidAccessException();
         }
     }
 
-    public boolean isOwner(UUID loginMemberId){
+    public boolean isOwner(UUID loginMemberId) {
         return this.memberId.equals(loginMemberId);
     }
 
-    public boolean isLeader(UUID loginMemberId){
+    public boolean isLeader(UUID loginMemberId) {
         return this.getCrew().getLeader().getMemberId().equals(loginMemberId);
     }
 

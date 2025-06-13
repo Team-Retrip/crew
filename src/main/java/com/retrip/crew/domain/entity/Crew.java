@@ -13,6 +13,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -39,19 +40,19 @@ public class Crew extends BaseEntity {
 
     @Embedded private Recruitment recruitment;
 
-    private Crew(String name, String description, int maxMembers, UUID leader) {
+    private Crew(String name, String description, int maxMembers, UUID leader, List<String> questions) {
         this.id = UUID.randomUUID();
         this.title = new CrewTitle(name);
         this.description = new CrewDescription(description);
-        this.recruitment = new Recruitment(maxMembers);
+        this.recruitment = Recruitment.of(maxMembers, questions, this);
         this.crewMembers = new CrewMembers(this, leader);
         this.posts = new Posts();
         this.announcements = new Announcements();
         this.introductions = new Introductions();
     }
 
-    public static Crew create(String title, String description, int maxMembers, UUID leader) {
-        return new Crew(title, description, maxMembers, leader);
+    public static Crew create(String title, String description, int maxMembers, UUID leader, List<String> questions) {
+        return new Crew(title, description, maxMembers, leader, questions);
     }
 
     public CrewMember getLeader() {

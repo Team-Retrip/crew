@@ -22,15 +22,10 @@ public class RecruitmentQuestion {
     private QuestionContent content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "crew_id",
-            nullable = false,
-            columnDefinition = "varbinary(16)",
-            foreignKey = @ForeignKey(name = "fk_question_to_crew")
-    )
+    @JoinColumn(name = "crew_id", nullable = false, columnDefinition = "varbinary(16)", foreignKey = @ForeignKey(name = "fk_question_to_crew"))
     private Crew crew;
 
-    public RecruitmentQuestion(UUID id,String content, Crew crew) {
+    public RecruitmentQuestion(UUID id, String content, Crew crew) {
         this.id = UUID.randomUUID();
         this.content = new QuestionContent(content);
         this.crew = crew;

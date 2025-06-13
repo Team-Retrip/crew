@@ -1,5 +1,7 @@
 package com.retrip.crew.application.in;
 
+import com.retrip.crew.application.in.request.crew.CrewCreateRequest;
+import com.retrip.crew.application.in.response.crew.CrewCreateResponse;
 import com.retrip.crew.common.ServiceTest;
 import com.retrip.crew.domain.entity.Crew;
 import com.retrip.crew.domain.entity.CrewMemberRole;

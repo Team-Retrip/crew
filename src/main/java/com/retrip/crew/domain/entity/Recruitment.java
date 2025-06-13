@@ -1,15 +1,18 @@
 package com.retrip.crew.domain.entity;
 
+import com.retrip.crew.domain.exception.DuplicateDemandException;
+import com.retrip.crew.domain.exception.IllegalDemandStateException;
+import com.retrip.crew.domain.exception.UnableToStartRecruitmentException;
+import com.retrip.crew.domain.exception.common.InvalidValueException;
 import com.retrip.crew.domain.vo.RecruitmentStatus;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.retrip.crew.domain.vo.RecruitmentStatus.RECRUITING;
@@ -30,8 +33,7 @@ public class Recruitment {
     @Embedded
     private RecruitmentQuestions recruitmentQuestions;
 
-    private Recruitment(int maxMembers, RecruitmentQuestions recruitmentQuestions) {
-    public Recruitment(int maxMembers) {
+    public Recruitment(int maxMembers, RecruitmentQuestions recruitmentQuestions) {
         this.maxMembers = maxMembers;
         this.status = RECRUITING;
         this.recruitmentQuestions = recruitmentQuestions;
@@ -41,7 +43,6 @@ public class Recruitment {
         RecruitmentQuestions recruitmentQuestions = new RecruitmentQuestions(questions, crew);
         return new Recruitment(maxMembers, recruitmentQuestions);
     }
-
 
 
     public void start(int membersSize) {
@@ -110,6 +111,8 @@ public class Recruitment {
         Demand find = findDemand(demand);
         throwIfNotPending(find);
         find.reject();
+    }
+
     public List<String> getRecruitmentQuestions() {
         return recruitmentQuestions.getValues().stream()
                 .map(question -> question.getContent().getValue())
