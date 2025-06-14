@@ -16,9 +16,11 @@ import com.retrip.crew.application.in.response.crew.CrewUpdateResponse;
 import com.retrip.crew.application.in.response.demand.CreateDemandResponse;
 import com.retrip.crew.common.ServiceTest;
 import com.retrip.crew.domain.entity.Crew;
+import com.retrip.crew.domain.entity.CrewMember;
 import com.retrip.crew.domain.entity.CrewMemberRole;
 import com.retrip.crew.domain.entity.Demand;
 import com.retrip.crew.domain.entity.Introduction;
+import com.retrip.crew.domain.exception.NotCrewLeaderException;
 import com.retrip.crew.domain.exception.common.InvalidAccessException;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
 import org.junit.jupiter.api.Test;
@@ -299,5 +301,41 @@ class CrewServiceTest extends ServiceTest {
         assertThat(response.introductionId()).isEqualTo(introduction.getId());
         assertThat(response.content()).isEqualTo("안녕하세요!");
         assertThat(response.title()).isEqualTo("정수의 자기소개!");
+    }
+
+    @Test
+    void 리더가_크루를_탈퇴한다() {
+        // given
+        Crew crew = Crew.create(
+                "속초 크루원 구함",
+                "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
+                100,
+                MEMBER_ID
+        );
+        Crew savedCrew = crewRepository.save(crew);
+
+        // when
+        crewService.deleteCrew(savedCrew.getId(), MEMBER_ID);
+        Crew deletedCrew = crewRepository.findById(savedCrew.getId()).get();
+
+        // then
+        assertThat(deletedCrew.isDeleted()).isTrue();
+    }
+
+    @Test
+    void 리더가_아니면_크루를_탈퇴할_수_없다() {
+        // given
+        Crew crew = Crew.create(
+                "속초 크루원 구함",
+                "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
+                100,
+                LEADER_ID
+        );
+        Crew savedCrew = crewRepository.save(crew);
+        Demand demand = savedCrew.demand(MEMBER_ID);
+        savedCrew.approveDemand(demand);
+
+        // when && then
+        assertThrows(NotCrewLeaderException.class, () -> crewService.deleteCrew(savedCrew.getId(), MEMBER_ID));
     }
 }
