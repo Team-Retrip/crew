@@ -1,5 +1,7 @@
 package com.retrip.crew.domain.entity;
 
+import com.retrip.crew.domain.exception.NotCrewLeaderException;
+import com.retrip.crew.domain.exception.common.BusinessException;
 import com.retrip.crew.domain.vo.CrewDescription;
 import com.retrip.crew.domain.vo.CrewTitle;
 
@@ -14,10 +16,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.UUID;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@SQLRestriction("is_deleted = false")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE crew SET is_deleted = true WHERE id = ?")
 public class Crew extends BaseEntity {
     @Id
     @Column(columnDefinition = "varbinary(16)")
@@ -38,6 +44,9 @@ public class Crew extends BaseEntity {
     @Embedded private Introductions introductions;
 
     @Embedded private Recruitment recruitment;
+
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
 
     private Crew(String name, String description, int maxMembers, UUID leader) {
         this.id = UUID.randomUUID();
@@ -95,5 +104,16 @@ public class Crew extends BaseEntity {
     public void approveDemand(Demand demand) {
         recruitment.approveDemand(demand);
         crewMembers.addMember(demand, this);
+    }
+
+    public void softDelete(UUID loginMemberId) {
+        validateCrewLeader(loginMemberId);
+        this.isDeleted = true;
+    }
+
+    private void validateCrewLeader(UUID loginMemberId) {
+        if(!this.getCrewMembers().isLeader(loginMemberId)){
+            throw new NotCrewLeaderException();
+        }
     }
 }

@@ -3,6 +3,9 @@ package com.retrip.crew.infra.adapter.in.presentation.rest;
 import com.retrip.crew.application.in.request.IntroductionCreateRequest;
 import com.retrip.crew.application.in.request.IntroductionDeleteRequest;
 import com.retrip.crew.application.in.request.IntroductionUpdateRequest;
+import com.retrip.crew.application.in.request.crew.CrewCreateRequest;
+import com.retrip.crew.application.in.request.crew.CrewOrder;
+import com.retrip.crew.application.in.request.crew.CrewUpdateRequest;
 import com.retrip.crew.application.in.request.crew.*;
 import com.retrip.crew.application.in.response.IntroductionCreateResponse;
 import com.retrip.crew.application.in.response.IntroductionDetailResponse;
@@ -134,5 +137,14 @@ public class CrewController {
             @RequestBody CrewLeaderDelegateRequest request) {
         CrewLeaderDelegateResponse response = manageCrewUseCase.delegateCrewLeader(crewId, request);
         return ApiResponse.ok(response);
+    }
+
+    @Schema(description = "크루 삭제")
+    @DeleteMapping("/{crewId}")
+    public ApiResponse<?> deleteCrew(
+            @PathVariable("crewId") final UUID crewId,
+            @RequestParam("loginMemberId") UUID loginMemberId) { //TODO: 로그인 구현 될 시 해당 부분 교체 해야함 임시방편으로 쿼리 파라미터에 넣음
+        manageCrewUseCase.deleteCrew(crewId, loginMemberId);
+        return ApiResponse.noContent();
     }
 }
