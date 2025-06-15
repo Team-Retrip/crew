@@ -22,6 +22,7 @@ import static com.retrip.crew.domain.vo.RecruitmentStatus.STOPPED;
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 @Embeddable
 public class Recruitment {
+
     private int maxMembers;
 
     @Column(name = "recruitment_status")
@@ -33,17 +34,15 @@ public class Recruitment {
     @Embedded
     private RecruitmentQuestions recruitmentQuestions;
 
-    public Recruitment(int maxMembers, RecruitmentQuestions recruitmentQuestions) {
+    private Recruitment(int maxMembers, List<String> questions, Crew crew) {
         this.maxMembers = maxMembers;
         this.status = RECRUITING;
-        this.recruitmentQuestions = recruitmentQuestions;
+        this.recruitmentQuestions = new RecruitmentQuestions(questions, crew);
     }
 
     public static Recruitment of(int maxMembers, List<String> questions, Crew crew) {
-        RecruitmentQuestions recruitmentQuestions = new RecruitmentQuestions(questions, crew);
-        return new Recruitment(maxMembers, recruitmentQuestions);
+        return new Recruitment(maxMembers, questions, crew);
     }
-
 
     public void start(int membersSize) {
         if (isRecruitmentComplete(membersSize)) {
@@ -65,15 +64,21 @@ public class Recruitment {
         this.maxMembers = maxMembers;
     }
 
+    public void addQuestion(RecruitmentQuestion question) {
+        this.recruitmentQuestions.add(question);
+    }
+
     public Demand addDemand(UUID memberId, Crew crew) {
         if (isDuplicate(memberId)) {
             throw new DuplicateDemandException();
         }
+
         Optional<Demand> reDemand = findReDemand(memberId);
         if (reDemand.isPresent()) {
             reDemand.get().restore();
             return reDemand.get();
         }
+
         Demand demand = new Demand(memberId, crew);
         demands.add(demand);
         return demand;
@@ -91,8 +96,7 @@ public class Recruitment {
     }
 
     private static boolean isReDemand(UUID memberId, Demand demand) {
-        return demand.isEqualTo(memberId)
-                && demand.isCanceled();
+        return demand.isEqualTo(memberId) && demand.isCanceled();
     }
 
     public void cancelDemand(Demand demand) {
@@ -113,11 +117,7 @@ public class Recruitment {
         find.reject();
     }
 
-    public List<String> getRecruitmentQuestions() {
-        return recruitmentQuestions.getValues().stream()
-                .map(question -> question.getContent().getValue())
-                .toList();
-    }
+
 
     private static void throwIfNotPending(Demand find) {
         if (find.isNotPending()) {

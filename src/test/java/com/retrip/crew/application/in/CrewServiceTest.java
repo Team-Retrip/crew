@@ -1,10 +1,23 @@
 package com.retrip.crew.application.in;
 
+import com.retrip.crew.application.in.request.IntroductionCreateRequest;
+import com.retrip.crew.application.in.request.IntroductionDeleteRequest;
+import com.retrip.crew.application.in.request.IntroductionUpdateRequest;
 import com.retrip.crew.application.in.request.crew.CrewCreateRequest;
+import com.retrip.crew.application.in.request.crew.CrewOrder;
+import com.retrip.crew.application.in.request.crew.CrewUpdateRequest;
+import com.retrip.crew.application.in.request.demand.CreateDemandRequest;
+import com.retrip.crew.application.in.response.IntroductionCreateResponse;
+import com.retrip.crew.application.in.response.IntroductionDetailResponse;
 import com.retrip.crew.application.in.response.crew.CrewCreateResponse;
+import com.retrip.crew.application.in.response.crew.CrewDetailResponse;
+import com.retrip.crew.application.in.response.crew.CrewListResponse;
+import com.retrip.crew.application.in.response.crew.CrewUpdateResponse;
+import com.retrip.crew.application.in.response.demand.CreateDemandResponse;
 import com.retrip.crew.common.ServiceTest;
 import com.retrip.crew.domain.entity.Crew;
 import com.retrip.crew.domain.entity.CrewMemberRole;
+import com.retrip.crew.domain.entity.Demand;
 import com.retrip.crew.domain.entity.Introduction;
 import com.retrip.crew.domain.exception.common.InvalidAccessException;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
@@ -17,6 +30,7 @@ import java.util.UUID;
 
 import static com.retrip.crew.common.fixture.CrewFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -29,7 +43,7 @@ class CrewServiceTest extends ServiceTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100,
-                List.of("질문")
+                createDefaultQuestions()
 
         );
 
@@ -48,8 +62,7 @@ class CrewServiceTest extends ServiceTest {
         CrewUpdateRequest request = new CrewUpdateRequest(
                 "강릉 크루원 구함",
                 "강릉 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
-                200,
-                List.of("질문1","질문2")
+                200
         );
 
         // when
@@ -69,11 +82,11 @@ class CrewServiceTest extends ServiceTest {
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100,
                 MEMBER_ID,
-                List.of("질문1")
+                createDefaultQuestions()
         ));
         CreateDemandRequest request = new CreateDemandRequest(MEMBER_ID);
 
-        CreateDemandResponse response = crewService.createDemand(crew.getId(), request);
+        CreateDemandResponse response = demandService.createDemand(crew.getId(), request);
 
         List<Demand> demands = crew.getRecruitment().getDemands();
         assertAll(
@@ -97,7 +110,7 @@ class CrewServiceTest extends ServiceTest {
         Crew save = crewRepository.save(crew);
         CreateDemandRequest request = new CreateDemandRequest(MEMBER_ID);
 
-        assertThatThrownBy(() -> crewService.createDemand(save.getId(), request))
+        assertThatThrownBy(() -> demandService.createDemand(save.getId(), request))
                 .isExactlyInstanceOf(IllegalStateException.class);
     }
 
@@ -164,7 +177,8 @@ class CrewServiceTest extends ServiceTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100,
-                MEMBER_ID
+                MEMBER_ID,
+                createDefaultQuestions()
         ));
         IntroductionCreateRequest request = new IntroductionCreateRequest(MEMBER_ID, "정수의 자기소개!", "안녕하세요!");
 
@@ -182,7 +196,8 @@ class CrewServiceTest extends ServiceTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100,
-                MEMBER_ID
+                MEMBER_ID,
+                createDefaultQuestions()
         );
         Introduction introduction = Introduction.create(
                 MEMBER_ID,
@@ -211,7 +226,8 @@ class CrewServiceTest extends ServiceTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100,
-                MEMBER_ID
+                MEMBER_ID,
+                createDefaultQuestions()
         );
         Introduction introduction = Introduction.create(
                 MEMBER_ID,
@@ -236,7 +252,8 @@ class CrewServiceTest extends ServiceTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100,
-                MEMBER_ID
+                MEMBER_ID,
+                createDefaultQuestions()
         );
         Introduction introduction = Introduction.create(
                 MEMBER_ID,
@@ -263,7 +280,8 @@ class CrewServiceTest extends ServiceTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100,
-                MEMBER_ID
+                MEMBER_ID,
+                createDefaultQuestions()
         );
         Introduction introduction = Introduction.create(
                 MEMBER_ID,

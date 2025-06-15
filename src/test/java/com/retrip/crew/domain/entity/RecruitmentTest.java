@@ -19,7 +19,7 @@ import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
 class RecruitmentTest {
     @Test
     void 모집을_생성한다() {
-        assertThatCode(() -> new Recruitment(100))
+        assertThatCode(() -> new Recruitment(100,))
                 .doesNotThrowAnyException();
     }
 
