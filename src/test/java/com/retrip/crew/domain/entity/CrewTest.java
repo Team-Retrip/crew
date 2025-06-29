@@ -4,6 +4,8 @@ import com.retrip.crew.domain.exception.UnableToStartRecruitmentException;
 import com.retrip.crew.domain.vo.RecruitmentStatus;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static com.retrip.crew.common.fixture.CrewFixture.*;
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 
@@ -14,7 +16,8 @@ class CrewTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100,
-                LEADER_ID)
+                LEADER_ID,
+                List.of("질문1"))
         ).doesNotThrowAnyException();
     }
 

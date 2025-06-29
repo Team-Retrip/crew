@@ -13,6 +13,7 @@ import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageRespo
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageRequest;
 
+import static com.retrip.crew.common.fixture.CrewFixture.createDefaultQuestions;
 import static com.retrip.crew.common.fixture.PostFixture.MEMBER_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -30,7 +31,9 @@ class PostServiceTest extends BasePostServiceTest {
                                 "속초 크루원 구함",
                                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                                 100,
-                                MEMBER_ID));
+                                MEMBER_ID,
+                                createDefaultQuestions()
+                                ));
         postService.createPost(
                 crew.getId(),
                 PostFixture.createRequest("속초 여행 어디가 좋아요?", "친구들과 속초 여행 가려고 합니다. 속초 여행지 추천해 주세요~"));
@@ -67,7 +70,8 @@ class PostServiceTest extends BasePostServiceTest {
                                 "속초 크루원 구함",
                                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                                 100,
-                                MEMBER_ID));
+                                MEMBER_ID,
+                                createDefaultQuestions()));
         crewRepository.save(crew);
 
         CreatePostRequest request =
@@ -91,7 +95,8 @@ class PostServiceTest extends BasePostServiceTest {
                                 "속초 크루원 구함",
                                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                                 100,
-                                MEMBER_ID));
+                                MEMBER_ID,
+                                createDefaultQuestions()));
         CreatePostResponse createPostResponse =
                 postService.createPost(
                         crew.getId(),
@@ -120,7 +125,8 @@ class PostServiceTest extends BasePostServiceTest {
                                 "속초 크루원 구함",
                                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                                 100,
-                                MEMBER_ID));
+                                MEMBER_ID,
+                                createDefaultQuestions()));
         CreatePostResponse createPostResponse =
                 postService.createPost(
                         crew.getId(),

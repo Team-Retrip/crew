@@ -1,10 +1,12 @@
 spring:
   application:
     name: crew
-#JPA
+  #JPA
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false;MODE=MySQL
+    username: sa
+    password:
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -15,13 +17,9 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
         default_batch_fetch_size: 100
     open-in-view: false
+
 #logging
 logging:
   level:
     org.hibernate.type.descriptor.sql: trace
-    org.hibernate.orm.jdbc.bind: TRACE
     org.springframework.web.client.RestTemplate: DEBUG
-
-springdoc:
-  swagger-ui:
-    use-root-path: true

@@ -14,6 +14,8 @@ public enum ErrorCode {
     ILLEGAL_STATE(BAD_REQUEST, "Common-005", "Illegal state"),
 
     CREW_NOT_FOUND(BAD_REQUEST, "Crew-001", "크루 엔티티를 찾을 수 없습니다."),
+    INVALID_QUESTION_COUNT(BAD_REQUEST, "Crew-002", "질문은 최대 10개까지 입력할 수 있습니다."),
+    INVALID_QUESTION_LENGTH(BAD_REQUEST, "Crew-003", "각 질문은 10자 이상 200자 이하로 입력해야 합니다."),
     NOT_CREW_LEADER(BAD_REQUEST, "Crew-002", "크루 리더가 아니면 접근할 수 없습니다."),
     UNABLE_TO_START_RECRUITMENT(BAD_REQUEST, "Crew-003", "크루 멤버를 모집할 수 없습니다."),
     DUPLICATE_DEMAND(BAD_REQUEST, "Crew-004", "이미 크루 참여를 요청한 사용자는 다시 요청할 수 없습니다."),
@@ -24,7 +26,11 @@ public enum ErrorCode {
     CREW_MEMBER_NOT_FOUND(BAD_REQUEST, "Crew-008", "크루원 멤버 엔티티를 찾을 수 없습니다.."),
     POST_NOT_FOUND(BAD_REQUEST, "Crew-009", "자유 게시글 엔티티를 찾을 수 없습니다."),
     POST_UPDATE_FAIL(FORBIDDEN, "Crew-010", "자유 게시글을 수정할 권한이 없습니다."),
-    POST_DELETE_FAIL(FORBIDDEN, "Crew-011", "자유 게시글을 삭제할 권한이 없습니다.")
+    POST_DELETE_FAIL(FORBIDDEN, "Crew-011", "자유 게시글을 삭제할 권한이 없습니다."),
+    QUESTION_UPDATE_FAIL(FORBIDDEN, "Crew-012", "질문 수정 권한이 없습니다."),
+    QUESTION_DELETE_FAIL(FORBIDDEN, "Crew-013", "질문 삭제 권한이 없습니다."),
+    QUESTION_NOT_FOUND(BAD_REQUEST, "Crew-014", "질문을 찾을 수 없습니다.");
+
     ;
 
     private final HttpStatus status;

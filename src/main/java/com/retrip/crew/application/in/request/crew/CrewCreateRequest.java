@@ -4,6 +4,7 @@ import com.retrip.crew.domain.entity.Crew;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Size;
 
+import java.util.List;
 import java.util.UUID;
 
 @Schema(description = "크루 생성 Request")
@@ -21,10 +22,14 @@ public record CrewCreateRequest(
 
         @Schema(description = "크루 최대 인원수")
         @Size(min = 5, max = 1000)
-        int maxMembers
+        int maxMembers,
+
+        @Schema(description = "크루 질문 목록")
+        @Size(min = 1, max = 5)
+        List<String> questions
 ){
 
     public Crew to(UUID leader) {
-        return Crew.create(this.title, this.description, this.maxMembers, leader);
+        return Crew.create(this.title, this.description, this.maxMembers, leader,this.questions);
     }
 }

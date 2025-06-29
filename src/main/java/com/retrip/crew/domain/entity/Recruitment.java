@@ -5,10 +5,7 @@ import com.retrip.crew.domain.exception.IllegalDemandStateException;
 import com.retrip.crew.domain.exception.UnableToStartRecruitmentException;
 import com.retrip.crew.domain.exception.common.InvalidValueException;
 import com.retrip.crew.domain.vo.RecruitmentStatus;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,6 +22,7 @@ import static com.retrip.crew.domain.vo.RecruitmentStatus.STOPPED;
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 @Embeddable
 public class Recruitment {
+
     private int maxMembers;
 
     @Column(name = "recruitment_status")
@@ -33,9 +31,17 @@ public class Recruitment {
     @OneToMany(mappedBy = "crew", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Demand> demands = new ArrayList<>();
 
-    public Recruitment(int maxMembers) {
+    @Embedded
+    private RecruitmentQuestions recruitmentQuestions;
+
+    private Recruitment(int maxMembers, List<String> questions, Crew crew) {
         this.maxMembers = maxMembers;
         this.status = RECRUITING;
+        this.recruitmentQuestions = new RecruitmentQuestions(questions, crew);
+    }
+
+    public static Recruitment of(int maxMembers, List<String> questions, Crew crew) {
+        return new Recruitment(maxMembers, questions, crew);
     }
 
     public void start(int membersSize) {
@@ -58,15 +64,21 @@ public class Recruitment {
         this.maxMembers = maxMembers;
     }
 
+    public void addQuestion(RecruitmentQuestion question) {
+        this.recruitmentQuestions.add(question);
+    }
+
     public Demand addDemand(UUID memberId, Crew crew) {
         if (isDuplicate(memberId)) {
             throw new DuplicateDemandException();
         }
+
         Optional<Demand> reDemand = findReDemand(memberId);
         if (reDemand.isPresent()) {
             reDemand.get().restore();
             return reDemand.get();
         }
+
         Demand demand = new Demand(memberId, crew);
         demands.add(demand);
         return demand;
@@ -84,8 +96,7 @@ public class Recruitment {
     }
 
     private static boolean isReDemand(UUID memberId, Demand demand) {
-        return demand.isEqualTo(memberId)
-                && demand.isCanceled();
+        return demand.isEqualTo(memberId) && demand.isCanceled();
     }
 
     public void cancelDemand(Demand demand) {
@@ -105,6 +116,8 @@ public class Recruitment {
         throwIfNotPending(find);
         find.reject();
     }
+
+
 
     private static void throwIfNotPending(Demand find) {
         if (find.isNotPending()) {

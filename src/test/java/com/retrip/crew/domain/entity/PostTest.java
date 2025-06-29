@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.UUID;
 
+import static com.retrip.crew.common.fixture.CrewFixture.createDefaultQuestions;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,7 +20,8 @@ class PostTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 5,
-                UUID.randomUUID());
+                UUID.randomUUID(),
+                createDefaultQuestions());
 
 
         //then
@@ -42,7 +44,8 @@ class PostTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 5,
-                UUID.randomUUID());
+                UUID.randomUUID(),
+                createDefaultQuestions());
 
 
         //then
@@ -61,7 +64,8 @@ class PostTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 5,
-                UUID.randomUUID());
+                UUID.randomUUID(),
+                createDefaultQuestions());
         Post post = Post.create(
                 "속초 여행 어디가 좋아요?",
                 "친구들과 속초 여행 가려고 합니다. 속초 여행지 추천해 주세요~",
@@ -80,7 +84,8 @@ class PostTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 5,
-                UUID.randomUUID());
+                UUID.randomUUID(),
+                createDefaultQuestions());
         Post post = Post.create(
                 "속초 여행 어디가 좋아요?",
                 "친구들과 속초 여행 가려고 합니다. 속초 여행지 추천해 주세요~",
