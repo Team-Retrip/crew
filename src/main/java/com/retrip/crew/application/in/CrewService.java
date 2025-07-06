@@ -3,6 +3,9 @@ package com.retrip.crew.application.in;
 import com.retrip.crew.application.in.request.IntroductionCreateRequest;
 import com.retrip.crew.application.in.request.IntroductionDeleteRequest;
 import com.retrip.crew.application.in.request.IntroductionUpdateRequest;
+import com.retrip.crew.application.in.request.crew.CrewCreateRequest;
+import com.retrip.crew.application.in.request.crew.CrewOrder;
+import com.retrip.crew.application.in.request.crew.CrewUpdateRequest;
 import com.retrip.crew.application.in.request.crew.*;
 import com.retrip.crew.application.in.response.IntroductionCreateResponse;
 import com.retrip.crew.application.in.response.IntroductionDetailResponse;
@@ -144,5 +147,11 @@ public class CrewService implements ManageCrewUseCase, GetCrewUseCase, ManageInt
         CrewMembers crewMembers = crew.getCrewMembers();
         CrewMember newLeader = crewMembers.delegateLeader(request.leaderId(), request.newLeaderId());
         return CrewLeaderDelegateResponse.of(newLeader);
+    }
+
+    @Override
+    public void deleteCrew(UUID crewId, UUID loginMemberId) {
+        Crew crew = findCrewById(crewId);
+        crew.softDelete(loginMemberId);
     }
 }

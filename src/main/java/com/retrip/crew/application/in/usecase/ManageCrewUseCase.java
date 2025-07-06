@@ -8,8 +8,6 @@ import com.retrip.crew.application.in.response.crew.CrewCreateResponse;
 import com.retrip.crew.application.in.response.crew.CrewLeaderDelegateResponse;
 import com.retrip.crew.application.in.response.crew.CrewUpdateResponse;
 
-import com.retrip.crew.domain.entity.Crew;
-
 import java.util.UUID;
 
 public interface ManageCrewUseCase {
@@ -20,4 +18,6 @@ public interface ManageCrewUseCase {
     void withdrawCrew(UUID crewId, CrewWithdrawalRequest request);
 
     CrewLeaderDelegateResponse delegateCrewLeader(UUID crewId, CrewLeaderDelegateRequest request);
+
+    void deleteCrew(UUID crewId, UUID loginMemberId);
 }
