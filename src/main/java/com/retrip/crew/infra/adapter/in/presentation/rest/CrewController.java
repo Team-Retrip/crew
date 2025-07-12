@@ -147,4 +147,30 @@ public class CrewController {
         manageCrewUseCase.deleteCrew(crewId, loginMemberId);
         return ApiResponse.noContent();
     }
+
+    @Schema(description = "크루 멤버 추방")
+    @DeleteMapping("/{crewId}/members/exile")
+    public ApiResponse<?> expelMember(@RequestParam("memberId") UUID memberId, //TODO: 추후 로그인 구현되면 이부분은 바뀔 에정
+                                      @PathVariable("crewId") UUID crewId,
+                                      @RequestBody CrewMemberExpelRequest request) {
+        manageCrewUseCase.expelMember(memberId, crewId, request.memberId());
+        return ApiResponse.noContent();
+    }
+
+    @Schema(description = "크루에서 회원 차단")
+    @PostMapping("/{crewId}/members/ban")
+    public ApiResponse<?> banMember(@RequestParam("memberId") UUID memberId, //TODO: 추후 로그인 구현되면 이부분은 바뀔 에정
+                                    @PathVariable("crewId") UUID crewId,
+                                    @RequestBody CrewMemberBanRequest request) {
+        manageCrewUseCase.banMember(memberId, crewId, request.memberId());
+        return ApiResponse.noContent();
+    }
+
+    @Schema(description = "크루 멤버 차단 목록 조회")
+    @GetMapping("/{crewId}/members/ban")
+    public ApiResponse<CrewBanListResponse> banMember(@RequestParam("memberId") UUID memberId, //TODO: 추후 로그인 구현되면 이부분은 바뀔 에정
+                                                      @PathVariable("crewId") UUID crewId) {
+        CrewBanListResponse banMembers = manageCrewUseCase.getBanMembers(memberId, crewId);
+        return ApiResponse.ok(banMembers);
+    }
 }

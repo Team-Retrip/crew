@@ -29,8 +29,9 @@ public enum ErrorCode {
     POST_DELETE_FAIL(FORBIDDEN, "Crew-011", "자유 게시글을 삭제할 권한이 없습니다."),
     QUESTION_UPDATE_FAIL(FORBIDDEN, "Crew-012", "질문 수정 권한이 없습니다."),
     QUESTION_DELETE_FAIL(FORBIDDEN, "Crew-013", "질문 삭제 권한이 없습니다."),
-    QUESTION_NOT_FOUND(BAD_REQUEST, "Crew-014", "질문을 찾을 수 없습니다.");
-
+    QUESTION_NOT_FOUND(BAD_REQUEST, "Crew-014", "질문을 찾을 수 없습니다."),
+    CREW_MEMBER_NOT_IN_CREW(BAD_REQUEST, "Crew-015","차단 대상 멤버가 해당 크루에 포함되어 있지 않습니다."),
+    CREW_MEMBER_BANNED_CANNOT_APPLY(HttpStatus.BAD_REQUEST, "Crew-016", "차단된 사용자는 해당 크루에 참가 신청할 수 없습니다."),
     ;
 
     private final HttpStatus status;

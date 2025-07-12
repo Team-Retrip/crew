@@ -1,8 +1,11 @@
 package com.retrip.crew.domain.entity;
 
+import static com.retrip.crew.domain.exception.common.ErrorCode.CREW_MEMBER_NOT_IN_CREW;
+
 import com.retrip.crew.domain.CrewTrip;
 import com.retrip.crew.domain.exception.ImpossibleWithdrawCrewException;
 import com.retrip.crew.domain.exception.NotCrewLeaderException;
+import com.retrip.crew.domain.exception.common.BusinessException;
 import com.retrip.crew.domain.exception.common.IllegalStateException;
 import com.retrip.crew.domain.exception.common.InvalidValueException;
 import jakarta.persistence.CascadeType;
@@ -105,6 +108,33 @@ public class CrewMembers {
     private void validatePossibleDelegate(CrewMember leader) {
         if (!leader.isLeader()) {
             throw new NotCrewLeaderException();
+        }
+    }
+
+    public void expelMember(UUID loginMemberId, UUID expellerId) {
+        validateCrewLeader(loginMemberId);
+        validateExistCrewMembers(expellerId);
+
+        CrewMember crewMemberToExpel = values.stream()
+                .filter(member -> expellerId.equals(member.getMemberId()))
+                .findFirst()
+                .orElseThrow(() -> new BusinessException(CREW_MEMBER_NOT_IN_CREW));
+
+        values.remove(crewMemberToExpel);
+    }
+
+    private void validateCrewLeader(UUID loginMemberId) {
+        if(!isLeader(loginMemberId)) {
+            throw new NotCrewLeaderException();
+        }
+    }
+
+    private void validateExistCrewMembers(UUID expellerId) {
+        boolean isExist = values.stream()
+                .anyMatch(member -> expellerId.equals(member.getMemberId()));
+
+        if(!isExist) {
+            throw new BusinessException(CREW_MEMBER_NOT_IN_CREW);
         }
     }
 }
