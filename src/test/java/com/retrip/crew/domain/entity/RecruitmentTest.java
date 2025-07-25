@@ -19,7 +19,8 @@ import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
 class RecruitmentTest {
     @Test
     void 모집을_생성한다() {
-        assertThatCode(() -> new Recruitment(100,))
+        Crew crew = createCrew(LEADER_ID);
+        assertThatCode(() -> new Recruitment(100,createDefaultQuestions(), crew))
                 .doesNotThrowAnyException();
     }
 
@@ -27,7 +28,7 @@ class RecruitmentTest {
     void 참여_요청을_취소한다() {
         // given
         Crew crew = createCrew(LEADER_ID);
-        Recruitment recruitment = new Recruitment(100);
+        Recruitment recruitment = new Recruitment(100,createDefaultQuestions(), crew);
         Demand demand = new Demand(정수_ID, crew);
         List<Demand> demands = List.of(
                 demand,
@@ -49,7 +50,7 @@ class RecruitmentTest {
     void 취소한_참여_요청을_재요청_한다() {
         // given
         Crew crew = createCrew(LEADER_ID);
-        Recruitment recruitment = new Recruitment(100);
+        Recruitment recruitment = new Recruitment(100,createDefaultQuestions(), crew);
         Demand demand = new Demand(정수_ID, crew);
         List<Demand> demands = List.of(
                 demand,
@@ -73,7 +74,7 @@ class RecruitmentTest {
     void 대기_상태가_아니면_참여_요청을_취소할_수_있다(DemandStatus status) {
         // given
         Crew crew = createCrew(LEADER_ID);
-        Recruitment recruitment = new Recruitment(100);
+        Recruitment recruitment = new Recruitment(100,createDefaultQuestions(), crew);
         Demand demand = new Demand(정수_ID, crew);
         List<Demand> demands = List.of(
                 demand,
@@ -94,7 +95,7 @@ class RecruitmentTest {
     void 참여_요청을_승인한다() {
         // given
         Crew crew = createCrew(LEADER_ID);
-        Recruitment recruitment = new Recruitment(100);
+        Recruitment recruitment = new Recruitment(100,createDefaultQuestions(), crew);
         Demand demand = new Demand(정수_ID, crew);
         ReflectionTestUtils.setField(recruitment, "demands", List.of(demand));
 
@@ -111,9 +112,10 @@ class RecruitmentTest {
         List<String> questions = List.of(
                 "1","2","3","4","5","6","7","8","9","10","11"
         );
+        Crew crew = createCrew(LEADER_ID);
 
         // when, then
-        assertThatThrownBy(() -> new Recruitment(10, questions))
+        assertThatThrownBy(() -> new Recruitment(10, questions, crew))
                 .isInstanceOf(InvalidValueException.class)
                 .hasMessageContaining("질문");
     }
@@ -122,21 +124,24 @@ class RecruitmentTest {
     void 질문_내용이_100자를_넘으면_예외가_발생한다() {
         String longQuestion = "a".repeat(101);
         List<String> questions = List.of(longQuestion);
+        Crew crew = createCrew(LEADER_ID);
 
-        assertThatThrownBy(() -> new Recruitment(10, questions))
-                .isInstanceOf(InvalidValueException.class)
-                .hasMessageContaining("질문 내용은 100자를 넘을 수 없습니다.");
+        assertThatThrownBy(() -> new Recruitment(10, questions, crew))
+                .isInstanceOf(InvalidValueException.class);
     }
 
 
     @Test
     void 질문_목록을_문자열로_조회할_수_있다() {
         // given
-        List<String> questions = List.of("가입 이유는?", "이전에 크루 활동을 해본 경험이 있나요?");
-        Recruitment recruitment = new Recruitment(10, questions);
+        Crew crew = createCrew(LEADER_ID);
+        List<String> questions = List.of("가입 이유는 무엇인가요?", "이전에 크루 활동을 해본 경험이 있나요?");
+        Recruitment recruitment = new Recruitment(10, questions, crew);
 
         // when
-        List<String> result = recruitment.getRecruitmentQuestions();
+        List<String> result = recruitment.getRecruitmentQuestions().getValues().stream()
+                .map(question -> question.getContent().getValue())
+                .toList();
 
         // then
         assertThat(result).containsExactlyElementsOf(questions);

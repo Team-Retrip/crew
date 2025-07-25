@@ -1,15 +1,22 @@
 package com.retrip.crew.application.in;
 
+import com.retrip.crew.application.in.request.CreateRecruitmentQuestionRequest;
+import com.retrip.crew.application.in.request.UpdateRecruitmentQuestionRequest;
 import com.retrip.crew.application.in.request.crew.CrewOrder;
 import com.retrip.crew.application.in.request.demand.CreateDemandRequest;
 import com.retrip.crew.application.in.request.demand.DemandOrder;
+import com.retrip.crew.application.in.response.CreateRecruitmentQuestionResponse;
+import com.retrip.crew.application.in.response.RecruitmentQuestionResponse;
+import com.retrip.crew.application.in.response.UpdateRecruitmentQuestionResponse;
 import com.retrip.crew.application.in.response.demand.CreateDemandResponse;
 import com.retrip.crew.application.in.response.demand.CrewsOfDemandResponse;
 import com.retrip.crew.application.in.response.demand.DemandsResponse;
 import com.retrip.crew.common.ServiceTest;
 import com.retrip.crew.domain.entity.Crew;
 import com.retrip.crew.domain.entity.Demand;
+import com.retrip.crew.domain.entity.RecruitmentQuestion;
 import com.retrip.crew.domain.exception.DuplicateDemandException;
+import com.retrip.crew.domain.exception.QuestionNotFoundException;
 import com.retrip.crew.domain.vo.DemandStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -122,5 +129,86 @@ class DemandServiceTest extends ServiceTest {
 
         // then
         assertThat(response.getTotalElements()).isEqualTo(5);
+    }
+
+    @Test
+    void 크루_참여_요청_질문을_등록한다() {
+        // given
+        Crew crew = crewRepository.save(createCrew(LEADER_ID));
+        CreateRecruitmentQuestionRequest request = new CreateRecruitmentQuestionRequest("크루 참여 동기를 작성해주세요.");
+
+        // when
+        CreateRecruitmentQuestionResponse response =
+                demandService.createRecruitmentQuestion(LEADER_ID, crew.getId(), request);
+
+        // then
+
+        // then
+        List<RecruitmentQuestion> questions = crew.getRecruitment().getRecruitmentQuestions().getValues();
+        assertAll(
+                () -> assertThat(questions).hasSize(6),
+                () -> assertThat(questions.get(5).getContent().getValue()).isEqualTo(request.content()),
+                () -> assertThat(response.content()).isEqualTo(request.content())
+        );
+    }
+
+    @Test
+    void 크루_참여_요청_질문을_수정한다() {
+        // given
+        Crew crew = crewRepository.save(createCrew(LEADER_ID));
+        RecruitmentQuestion question = RecruitmentQuestion.create("크루 참여 동기를 작성해주세요.", crew);
+        crew.addRecruitmentQuestion(LEADER_ID, question);
+
+        UpdateRecruitmentQuestionRequest request = new UpdateRecruitmentQuestionRequest("크루 참여 동기를 작성해주세요요요요요");
+
+        // when
+        UpdateRecruitmentQuestionResponse response =
+                demandService.updateRecruitmentQuestion(LEADER_ID, crew.getId(), question.getId(), request);
+
+        // then
+        assertThat(question.getContent().getValue()).isEqualTo(request.content());
+        assertThat(response.content()).isEqualTo(request.content());
+    }
+
+    @Test
+    void 크루_참여_요청_질문을_삭제한다() {
+        // given
+        Crew crew = crewRepository.save(createCrew(LEADER_ID));
+        RecruitmentQuestion question = RecruitmentQuestion.create("크루 참여 동기를 작성해주세요.", crew);
+        crew.addRecruitmentQuestion(LEADER_ID, question);
+
+        // when
+        demandService.deleteRecruitmentQuestion(LEADER_ID, crew.getId(), question.getId());
+
+        // then
+        assertThat(crew.getRecruitment().getRecruitmentQuestions().getValues().size()).isEqualTo(5);
+    }
+
+    @Test
+    void 크루_참여_요청_질문을_조회한다() {
+        // given
+        Crew crew = crewRepository.save(createCrew(LEADER_ID));
+        RecruitmentQuestion question1 = RecruitmentQuestion.create("크루 참여 동기를 작성해주세요.1", crew);
+        RecruitmentQuestion question2 = RecruitmentQuestion.create("크루 참여 동기를 작성해주세요.2", crew);
+        crew.addRecruitmentQuestion(LEADER_ID, question1);
+        crew.addRecruitmentQuestion(LEADER_ID, question2);
+
+        // when
+        List<RecruitmentQuestionResponse> responses =
+                demandService.getRecruitmentQuestions(LEADER_ID, crew.getId());
+
+        // then
+        assertThat(responses).hasSize(7);
+        assertThat(responses)
+                .extracting(RecruitmentQuestionResponse::content)
+                .containsExactlyInAnyOrder(
+                        "크루 참여 동기를 작성해주세요.1",
+                        "크루 참여 동기를 작성해주세요.2",
+                        "크루에 지원한 이유는 무엇인가요?",
+                        "어떤 활동을 기대하고 있나요?",
+                        "자신을 한 문장으로 표현한다면?",
+                        "크루에서 어떤 역할을 하고 싶나요?",
+                        "추가로 하고 싶은 말이 있나요?"
+                );
     }
 }

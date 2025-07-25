@@ -17,7 +17,7 @@ class CrewTest {
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100,
                 LEADER_ID,
-                List.of("질문1"))
+                createDefaultQuestions())
         ).doesNotThrowAnyException();
     }
 

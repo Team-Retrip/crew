@@ -1,5 +1,11 @@
 package com.retrip.crew.application.in;
 
+import static com.retrip.crew.common.fixture.CrewFixture.createDefaultQuestions;
+import static com.retrip.crew.common.fixture.PostFixture.MEMBER_ID;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
 import com.retrip.crew.application.in.factory.BasePostServiceTest;
 import com.retrip.crew.application.in.request.CreatePostRequest;
 import com.retrip.crew.application.in.request.PostOrder;
@@ -12,12 +18,6 @@ import com.retrip.crew.domain.entity.Crew;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageRequest;
-
-import static com.retrip.crew.common.fixture.CrewFixture.createDefaultQuestions;
-import static com.retrip.crew.common.fixture.PostFixture.MEMBER_ID;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class PostServiceTest extends BasePostServiceTest {
 
