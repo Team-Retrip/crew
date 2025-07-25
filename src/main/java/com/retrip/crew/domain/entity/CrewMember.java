@@ -30,11 +30,15 @@ public class CrewMember extends BaseEntity {
     @Column(nullable = false)
     private UUID memberId;
 
+    @Enumerated(EnumType.STRING)
+    private CrewMemberStatus status;
+
     public CrewMember(Crew crew, UUID memberId, CrewMemberRole crewMemberRole) {
         this.id = UUID.randomUUID();
         this.crew = crew;
         this.memberId = memberId;
         this.crewMemberRole = CrewMemberRole.valueOf(crewMemberRole.name());
+        this.status = CrewMemberStatus.ACTIVE;
     }
 
     public boolean isLeader() {
@@ -47,5 +51,13 @@ public class CrewMember extends BaseEntity {
 
     public boolean isCreatedByMe(UUID postCreatedBy) {
         return postCreatedBy == memberId;
+    }
+
+    public void expel() {
+        this.status = CrewMemberStatus.EXPELLED;
+    }
+
+    public boolean isExpelled() {
+        return this.status == CrewMemberStatus.EXPELLED;
     }
 }

@@ -147,4 +147,14 @@ public class CrewController {
         manageCrewUseCase.deleteCrew(crewId, loginMemberId);
         return ApiResponse.noContent();
     }
+
+    @Schema(description = "크루원 추방")
+    @PutMapping("/{crewId}/expel")
+    public ApiResponse<Void> expelMember(
+            @PathVariable final UUID crewId,
+            @RequestBody CrewExpelRequest request
+    ) {
+        manageCrewUseCase.expelMember(crewId, request);
+        return ApiResponse.noContent();
+    }
 }

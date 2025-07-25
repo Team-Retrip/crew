@@ -118,7 +118,6 @@ public class Recruitment {
     }
 
 
-
     private static void throwIfNotPending(Demand find) {
         if (find.isNotPending()) {
             throw new IllegalDemandStateException("참여 요청의 상태가 대기중이 아닙니다.");

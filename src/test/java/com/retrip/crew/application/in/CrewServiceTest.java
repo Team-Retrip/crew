@@ -4,6 +4,7 @@ import com.retrip.crew.application.in.request.IntroductionCreateRequest;
 import com.retrip.crew.application.in.request.IntroductionDeleteRequest;
 import com.retrip.crew.application.in.request.IntroductionUpdateRequest;
 import com.retrip.crew.application.in.request.crew.CrewCreateRequest;
+import com.retrip.crew.application.in.request.crew.CrewExpelRequest;
 import com.retrip.crew.application.in.request.crew.CrewOrder;
 import com.retrip.crew.application.in.request.crew.CrewUpdateRequest;
 import com.retrip.crew.application.in.request.demand.CreateDemandRequest;
@@ -20,6 +21,7 @@ import com.retrip.crew.domain.entity.CrewMember;
 import com.retrip.crew.domain.entity.CrewMemberRole;
 import com.retrip.crew.domain.entity.Demand;
 import com.retrip.crew.domain.entity.Introduction;
+import com.retrip.crew.domain.exception.DuplicateDemandException;
 import com.retrip.crew.domain.exception.NotCrewLeaderException;
 import com.retrip.crew.domain.exception.common.InvalidAccessException;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
@@ -104,7 +106,7 @@ class CrewServiceTest extends ServiceTest {
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100,
                 MEMBER_ID,
-                List.of("질문1")
+                List.of("속초 맛집 아시나요?")
         );
         crew.demand(MEMBER_ID);
         crew.demand(UUID.randomUUID());
@@ -113,7 +115,7 @@ class CrewServiceTest extends ServiceTest {
         CreateDemandRequest request = new CreateDemandRequest(MEMBER_ID);
 
         assertThatThrownBy(() -> demandService.createDemand(save.getId(), request))
-                .isExactlyInstanceOf(IllegalStateException.class);
+                .isExactlyInstanceOf(DuplicateDemandException.class);
     }
 
     @Test
@@ -125,7 +127,7 @@ class CrewServiceTest extends ServiceTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 5,
-                List.of("질문1")
+                List.of("속초 맛집을 아시나요?")
         );
         requests.forEach(request -> {
             CrewCreateResponse response = crewService.createCrew(request);
@@ -155,7 +157,7 @@ class CrewServiceTest extends ServiceTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 5,
-                List.of("질문1")
+                List.of("속초 맛집을 아시나요?")
         );
         UUID crewId = crewService.createCrew(request).id();
 
@@ -310,7 +312,8 @@ class CrewServiceTest extends ServiceTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100,
-                MEMBER_ID
+                MEMBER_ID,
+                createDefaultQuestions()
         );
         Crew savedCrew = crewRepository.save(crew);
 
@@ -329,7 +332,8 @@ class CrewServiceTest extends ServiceTest {
                 "속초 크루원 구함",
                 "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
                 100,
-                LEADER_ID
+                LEADER_ID,
+                createDefaultQuestions()
         );
         Crew savedCrew = crewRepository.save(crew);
         Demand demand = savedCrew.demand(MEMBER_ID);
@@ -337,5 +341,21 @@ class CrewServiceTest extends ServiceTest {
 
         // when && then
         assertThrows(NotCrewLeaderException.class, () -> crewService.deleteCrew(savedCrew.getId(), MEMBER_ID));
+    }
+
+    @Test
+    void 크루원을_추방한다() {
+        // given
+        Crew crew = crewRepository.save(createCrewWithMutableMembers(LEADER_ID));
+        CrewExpelRequest request = new CrewExpelRequest(LEADER_ID, 홍석_ID);
+
+        // when
+        crewService.expelMember(crew.getId(), request);
+        Crew result = crewService.findCrewById(crew.getId());
+
+        // then
+        assertThat(result.getCrewMembers().getValues()
+                .stream().filter(member -> member.getMemberId().equals(홍석_ID))
+                .findFirst().get().isExpelled()).isTrue();
     }
 }

@@ -154,4 +154,10 @@ public class CrewService implements ManageCrewUseCase, GetCrewUseCase, ManageInt
         Crew crew = findCrewById(crewId);
         crew.softDelete(loginMemberId);
     }
+
+    @Override
+    public void expelMember(UUID crewId, CrewExpelRequest request) {
+        Crew crew = findCrewById(crewId);
+        crew.getCrewMembers().expel(request.leaderId(), request.memberId());
+    }
 }
