@@ -1,6 +1,7 @@
 package com.retrip.crew.application.in.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Schema(description = "참여요청질문 Response")

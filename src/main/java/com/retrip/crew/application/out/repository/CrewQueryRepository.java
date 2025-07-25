@@ -14,6 +14,5 @@ public interface CrewQueryRepository {
     Slice<CrewListResponse> getCrews(Pageable pageable, String keyword);
     Long getCrewCount(String keyword);
     Optional<Crew> findByIdWithPosts(UUID id);
-    Optional<Crew> findByIdWithRecruitment(UUID crewId);
     Page<CrewsOfDemandResponse> findAllContainsMember(Pageable pageable, UUID memberId);
 }

@@ -6,8 +6,6 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.retrip.crew.application.in.response.RecruitmentQuestionResponse;
 import com.retrip.crew.application.out.repository.RecruitmentQuestionQueryRepository;
-import com.retrip.crew.domain.entity.RecruitmentQuestion;
-import com.retrip.crew.domain.exception.QuestionNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -25,26 +23,12 @@ public class RecruitmentQuestionQuerydslRepository implements RecruitmentQuestio
         return query
                 .select(Projections.constructor(
                         RecruitmentQuestionResponse.class,
-                        recruitmentQuestion.id,
-                        recruitmentQuestion.content.value,
-                        recruitmentQuestion.createdAt))
+                        recruitmentQuestion.id.as("id"),
+                        recruitmentQuestion.content.value.as("content"))
+                )
                 .from(recruitmentQuestion)
                 .where(recruitmentQuestion.crew.id.eq(crewId))
                 .orderBy(recruitmentQuestion.createdAt.desc())
                 .fetch();
-    }
-
-    @Override
-    public RecruitmentQuestion findByIdOrElseThrow(UUID questionId) {
-        RecruitmentQuestion question = query
-                .selectFrom(recruitmentQuestion)
-                .where(recruitmentQuestion.id.eq(questionId))
-                .fetchOne();
-
-        if (question == null) {
-            throw new QuestionNotFoundException();
-        }
-
-        return question;
     }
 }

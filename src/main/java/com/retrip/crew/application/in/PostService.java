@@ -4,7 +4,6 @@ import com.retrip.crew.application.in.request.CreatePostRequest;
 import com.retrip.crew.application.in.request.PostOrder;
 import com.retrip.crew.application.in.request.UpdatePostRequest;
 import com.retrip.crew.application.in.response.CreatePostResponse;
-import com.retrip.crew.application.in.response.DeletePostResponse;
 import com.retrip.crew.application.in.response.PostResponse;
 import com.retrip.crew.application.in.response.UpdatePostResponse;
 import com.retrip.crew.application.in.usecase.GetPostUseCase;
@@ -16,19 +15,15 @@ import com.retrip.crew.domain.entity.Crew;
 import com.retrip.crew.domain.entity.CrewMember;
 import com.retrip.crew.domain.entity.Post;
 import com.retrip.crew.domain.exception.CrewMemberNotFoundException;
-
 import com.retrip.crew.domain.exception.CrewNotFoundException;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
 import com.retrip.crew.infra.util.PaginationUtils;
-
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Service
 @Transactional

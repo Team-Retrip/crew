@@ -1,7 +1,6 @@
 package com.retrip.crew.domain.entity;
 
 import com.retrip.crew.domain.exception.NotCrewLeaderException;
-import com.retrip.crew.domain.exception.common.BusinessException;
 import com.retrip.crew.domain.vo.CrewDescription;
 import com.retrip.crew.domain.vo.CrewTitle;
 
@@ -112,9 +111,19 @@ public class Crew extends BaseEntity {
         this.isDeleted = true;
     }
 
-    private void validateCrewLeader(UUID loginMemberId) {
+    public void validateCrewLeader(UUID loginMemberId) {
         if(!this.getCrewMembers().isLeader(loginMemberId)){
             throw new NotCrewLeaderException();
         }
+    }
+
+    public void addRecruitmentQuestion(UUID memberId, RecruitmentQuestion question) {
+        validateCrewLeader(memberId);
+        recruitment.addRecruitmentQuestion(question);
+    }
+
+    public void deleteRecruitmentQuestion(UUID memberId, RecruitmentQuestion savedQuestion) {
+        validateCrewLeader(memberId);
+        recruitment.deleteRecruitmentQuestion(savedQuestion);
     }
 }
