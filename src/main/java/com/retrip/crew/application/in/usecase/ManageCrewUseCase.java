@@ -1,6 +1,7 @@
 package com.retrip.crew.application.in.usecase;
 
 import com.retrip.crew.application.in.request.crew.CrewCreateRequest;
+import com.retrip.crew.application.in.request.crew.CrewExpelRequest;
 import com.retrip.crew.application.in.request.crew.CrewLeaderDelegateRequest;
 import com.retrip.crew.application.in.request.crew.CrewUpdateRequest;
 import com.retrip.crew.application.in.request.crew.CrewWithdrawalRequest;
@@ -20,4 +21,6 @@ public interface ManageCrewUseCase {
     CrewLeaderDelegateResponse delegateCrewLeader(UUID crewId, CrewLeaderDelegateRequest request);
 
     void deleteCrew(UUID crewId, UUID loginMemberId);
+
+    void expelMember(UUID crewId, CrewExpelRequest request);
 }

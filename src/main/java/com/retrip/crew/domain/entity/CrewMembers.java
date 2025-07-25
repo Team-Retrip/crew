@@ -1,6 +1,7 @@
 package com.retrip.crew.domain.entity;
 
 import com.retrip.crew.domain.CrewTrip;
+import com.retrip.crew.domain.exception.CrewMemberExpelFailedException;
 import com.retrip.crew.domain.exception.ImpossibleWithdrawCrewException;
 import com.retrip.crew.domain.exception.NotCrewLeaderException;
 import com.retrip.crew.domain.exception.common.IllegalStateException;
@@ -40,7 +41,7 @@ public class CrewMembers {
     }
 
     public int getSize() {
-        return this.values.size();
+        return (int) this.values.stream().filter(member -> !member.isExpelled()).count();
     }
 
     public boolean isLeader(UUID memberId) {
@@ -49,17 +50,20 @@ public class CrewMembers {
     }
 
     public void addMember(Demand demand, Crew crew) {
-        if (isDuplicate(demand)) {
-            throw new IllegalStateException("사용자는 이미 크루 멤버 입니다.");
-        }
+        this.values.stream()
+                .filter(m -> m.getMemberId().equals(demand.getMemberId()))
+                .findFirst()
+                .ifPresent(member -> {
+                    if (member.isExpelled()) {
+                        throw new IllegalStateException("추방된 사용자는 다시 크루에 참여 요청 할 수 없습니다.");
+                    }
+                    throw new IllegalStateException("이미 크루에 참여한 사용자입니다.");
+                });
+
         CrewMember member = new CrewMember(crew, demand.getMemberId(), CrewMemberRole.PARTICIPANT);
         values.add(member);
     }
 
-    private boolean isDuplicate(Demand demand) {
-        return this.values.stream()
-                .anyMatch(m -> m.getMemberId().equals(demand.getMemberId()));
-    }
 
     public void withdraw(UUID memberId, List<CrewTrip> participatingCrewTrips) {
         validatePossibleWithdrawal(memberId, participatingCrewTrips);
@@ -87,7 +91,7 @@ public class CrewMembers {
 
     private CrewMember findMember(UUID memberId) {
         return this.values.stream()
-                .filter(m -> memberId.equals(m.getMemberId()))
+                .filter(m -> memberId.equals(m.getMemberId()) && !m.isExpelled())
                 .findFirst()
                 .orElseThrow(() -> new InvalidValueException("크루 멤버가 아닙니다."));
     }
@@ -106,5 +110,18 @@ public class CrewMembers {
         if (!leader.isLeader()) {
             throw new NotCrewLeaderException();
         }
+    }
+
+    public void expel(UUID leaderId, UUID memberId) {
+        if (!isLeader(leaderId)) {
+            throw new NotCrewLeaderException();
+        }
+
+        if (leaderId.equals(memberId)) {
+            throw new CrewMemberExpelFailedException("자기 자신을 추방할 수 없습니다.");
+        }
+
+        CrewMember memberToExpel = findMember(memberId);
+        memberToExpel.expel();
     }
 }

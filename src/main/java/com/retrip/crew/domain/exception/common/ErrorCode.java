@@ -29,7 +29,8 @@ public enum ErrorCode {
     POST_DELETE_FAIL(FORBIDDEN, "Crew-011", "자유 게시글을 삭제할 권한이 없습니다."),
     QUESTION_UPDATE_FAIL(FORBIDDEN, "Crew-012", "질문 수정 권한이 없습니다."),
     QUESTION_DELETE_FAIL(FORBIDDEN, "Crew-013", "질문 삭제 권한이 없습니다."),
-    QUESTION_NOT_FOUND(BAD_REQUEST, "Crew-014", "질문을 찾을 수 없습니다.");
+    QUESTION_NOT_FOUND(BAD_REQUEST, "Crew-014", "질문을 찾을 수 없습니다."),
+    CREW_MEMBER_EXPEL_FAIL(FORBIDDEN, "Crew-015", "크루원 추방에 실패했습니다.");
 
     ;
 

@@ -1,7 +1,9 @@
 package com.retrip.crew.domain.entity;
 
 import com.retrip.crew.domain.CrewTrip;
+import com.retrip.crew.domain.exception.CrewMemberExpelFailedException;
 import com.retrip.crew.domain.exception.ImpossibleWithdrawCrewException;
+import com.retrip.crew.domain.exception.NotCrewLeaderException;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -148,5 +150,41 @@ class CrewMembersTest {
         assertThat(newLeader.getMemberId()).isEqualTo(홍석_ID);
         assertThat(newLeader.getCrewMemberRole()).isEqualTo(CrewMemberRole.LEADER);
         assertThat(leader.getCrewMemberRole()).isEqualTo(CrewMemberRole.PARTICIPANT);
+    }
+
+    @Test
+    void 리더가_크루원을_추방한다() {
+        // given
+        Crew crew = createCrewWithMutableMembers(LEADER_ID);
+
+        // when
+        crew.getCrewMembers().expel(LEADER_ID, 홍석_ID);
+
+        // then
+        CrewMember expelledMember = crew.getCrewMembers().getValues().stream()
+                .filter(member -> member.getMemberId().equals(홍석_ID))
+                .findFirst()
+                .get();
+        assertThat(expelledMember.isExpelled()).isTrue();
+    }
+
+    @Test
+    void 리더가_아니면_크루원_추방에_실패한다() {
+        // given
+        Crew crew = createCrewWithMutableMembers(LEADER_ID);
+
+        // when, then
+        assertThatThrownBy(() -> crew.getCrewMembers().expel(홍석_ID, 정수_ID))
+                .isExactlyInstanceOf(NotCrewLeaderException.class);
+    }
+
+    @Test
+    void 리더가_자기_자신을_추방하면_실패한다() {
+        // given
+        Crew crew = createCrewWithMutableMembers(LEADER_ID);
+
+        // when, then
+        assertThatThrownBy(() -> crew.getCrewMembers().expel(LEADER_ID, LEADER_ID))
+                .isExactlyInstanceOf(CrewMemberExpelFailedException.class);
     }
 }
