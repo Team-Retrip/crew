@@ -156,15 +156,4 @@ public class CrewQuerydslRepository implements CrewQueryRepository {
         }
         return new OrderSpecifier<>(Order.ASC, crew.createdAt);
     }
-
-    @Override
-    public Optional<Crew> findByIdWithRecruitment(UUID crewId) {
-        return Optional.ofNullable(
-                query.selectFrom(crew)
-                        .distinct()
-                        .leftJoin(crew.recruitment.recruitmentQuestions.values).fetchJoin()
-                        .where(crew.id.eq(crewId))
-                        .fetchOne()
-        );
-    }
 }

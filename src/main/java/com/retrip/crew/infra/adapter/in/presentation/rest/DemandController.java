@@ -1,14 +1,21 @@
 package com.retrip.crew.infra.adapter.in.presentation.rest;
 
+import com.retrip.crew.application.in.request.CreateRecruitmentQuestionRequest;
+import com.retrip.crew.application.in.request.UpdateRecruitmentQuestionRequest;
 import com.retrip.crew.application.in.request.crew.CrewOrder;
 import com.retrip.crew.application.in.request.demand.CreateDemandRequest;
 import com.retrip.crew.application.in.request.demand.DemandOrder;
+import com.retrip.crew.application.in.response.CreateRecruitmentQuestionResponse;
+import com.retrip.crew.application.in.response.RecruitmentQuestionResponse;
+import com.retrip.crew.application.in.response.UpdateRecruitmentQuestionResponse;
 import com.retrip.crew.application.in.response.demand.*;
 import com.retrip.crew.application.in.usecase.ManageDemandUseCase;
+import com.retrip.crew.application.in.usecase.ManageRecruitmentQuestionUseCase;
 import com.retrip.crew.application.in.usecase.UpdateRecruitmentUseCase;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +30,7 @@ import java.util.UUID;
 @Tag(name = "Recruitment", description = "크루 참여 모집 서비스")
 public class DemandController {
     private final UpdateRecruitmentUseCase updateRecruitmentUseCase;
+    private final ManageRecruitmentQuestionUseCase manageRecruitmentQuestionUseCase;
     private final ManageDemandUseCase manageDemandUseCase;
 
     @PutMapping("/{crewId}/recruitments/start")
@@ -104,5 +112,45 @@ public class DemandController {
             @RequestParam final UUID memberId) {
         RejectDemandResponse demand = manageDemandUseCase.rejectDemand(crewId, demandId, memberId);
         return ApiResponse.ok(demand);
+    }
+
+    @PostMapping("/{crewId}/demands/question")
+    @Schema(description = "크루 참여 요청 질문 등록")
+    public ApiResponse<CreateRecruitmentQuestionResponse> createRecruitmentQuestion(
+            @PathVariable final UUID crewId,
+            @RequestParam final UUID memberId,
+            @RequestBody CreateRecruitmentQuestionRequest request) {
+        CreateRecruitmentQuestionResponse demand = manageRecruitmentQuestionUseCase.createRecruitmentQuestion(memberId, crewId, request);
+        return ApiResponse.created(demand);
+    }
+
+    @PostMapping("/{crewId}/demands/question/{questionId}")
+    @Schema(description = "크루 참여 요청 질문 수정")
+    public ApiResponse<UpdateRecruitmentQuestionResponse> updateRecruitmentQuestion(
+            @PathVariable final UUID crewId,
+            @PathVariable final UUID questionId,
+            @RequestParam final UUID memberId,
+            @RequestBody UpdateRecruitmentQuestionRequest request) {
+        UpdateRecruitmentQuestionResponse demand = manageRecruitmentQuestionUseCase.updateRecruitmentQuestion(memberId, crewId, questionId, request);
+        return ApiResponse.ok(demand);
+    }
+
+    @DeleteMapping("/{crewId}/demands/question/{questionId}")
+    @Schema(description = "크루 참여 요청 질문 삭제")
+    public ApiResponse<UpdateRecruitmentQuestionResponse> deleteRecruitmentQuestion(
+            @PathVariable final UUID crewId,
+            @PathVariable final UUID questionId,
+            @RequestParam final UUID memberId) {
+        manageRecruitmentQuestionUseCase.deleteRecruitmentQuestion(memberId, crewId, questionId);
+        return ApiResponse.noContent();
+    }
+
+    @GetMapping("/{crewId}/demands/question")
+    @Schema(description = "크루 참여 요청 질문 조회")
+    public ApiResponse<List<RecruitmentQuestionResponse>> getRecruitmentQuestions(
+            @PathVariable final UUID crewId,
+            @RequestParam final UUID memberId) {
+        List<RecruitmentQuestionResponse> response = manageRecruitmentQuestionUseCase.getRecruitmentQuestions(crewId, memberId);
+        return ApiResponse.ok(response);
     }
 }

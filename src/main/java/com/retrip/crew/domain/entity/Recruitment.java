@@ -31,10 +31,9 @@ public class Recruitment {
     @OneToMany(mappedBy = "crew", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Demand> demands = new ArrayList<>();
 
-    @Embedded
-    private RecruitmentQuestions recruitmentQuestions;
+    @Embedded private RecruitmentQuestions recruitmentQuestions;
 
-    private Recruitment(int maxMembers, List<String> questions, Crew crew) {
+    public Recruitment(int maxMembers, List<String> questions, Crew crew) {
         this.maxMembers = maxMembers;
         this.status = RECRUITING;
         this.recruitmentQuestions = new RecruitmentQuestions(questions, crew);
@@ -62,10 +61,6 @@ public class Recruitment {
 
     public void updateMaxMembers(int maxMembers) {
         this.maxMembers = maxMembers;
-    }
-
-    public void addQuestion(RecruitmentQuestion question) {
-        this.recruitmentQuestions.add(question);
     }
 
     public Demand addDemand(UUID memberId, Crew crew) {
@@ -117,8 +112,6 @@ public class Recruitment {
         find.reject();
     }
 
-
-
     private static void throwIfNotPending(Demand find) {
         if (find.isNotPending()) {
             throw new IllegalDemandStateException("참여 요청의 상태가 대기중이 아닙니다.");
@@ -130,5 +123,13 @@ public class Recruitment {
                 .filter(d -> d.equals(demand))
                 .findFirst()
                 .orElseThrow(() -> new InvalidValueException("참여 요청을 찾을 수 없습니다."));
+    }
+
+    public void addRecruitmentQuestion(RecruitmentQuestion question) {
+        this.recruitmentQuestions.add(question);
+    }
+
+    public void deleteRecruitmentQuestion(RecruitmentQuestion savedQuestion) {
+        this.recruitmentQuestions.delete(savedQuestion);
     }
 }

@@ -2,10 +2,12 @@ package com.retrip.crew.common.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.retrip.crew.application.out.repository.CrewMemberQueryRepository;
+import com.retrip.crew.application.out.repository.RecruitmentQuestionQueryRepository;
 import com.retrip.crew.infra.adapter.out.persistence.mysql.query.CrewMemberQuerydslRepository;
 import com.retrip.crew.infra.adapter.out.persistence.mysql.query.CrewQuerydslRepository;
 import com.retrip.crew.infra.adapter.out.persistence.mysql.query.IntroductionQuerydslRepository;
 
+import com.retrip.crew.infra.adapter.out.persistence.mysql.query.RecruitmentQuestionQuerydslRepository;
 import jakarta.persistence.EntityManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,11 @@ public class QuerydslConfig {
     @Bean
     public CrewMemberQueryRepository crewMemberQueryRepository(JPAQueryFactory jpaQueryFactory) {
         return new CrewMemberQuerydslRepository(jpaQueryFactory);
+    }
+
+    @Bean
+    public RecruitmentQuestionQueryRepository recruitmentQuestionQueryRepository(JPAQueryFactory jpaQueryFactory) {
+        return new RecruitmentQuestionQuerydslRepository(jpaQueryFactory);
     }
 
     @Bean

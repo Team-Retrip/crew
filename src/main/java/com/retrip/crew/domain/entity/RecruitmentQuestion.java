@@ -1,13 +1,18 @@
 package com.retrip.crew.domain.entity;
 
-import com.retrip.crew.domain.exception.QuestionUpdateFailedException;
 import com.retrip.crew.domain.vo.QuestionContent;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
@@ -40,17 +45,7 @@ public class RecruitmentQuestion extends BaseEntity {
     }
 
     public void update(String content, UUID memberId) {
-//        isUpdatable(this.getCreatedBy(), memberId);
+        this.crew.validateCrewLeader(memberId);
         this.content = new QuestionContent(content);
     }
-
-    private void isUpdatable(UUID createBy, UUID updateBy) {
-        if (!createBy.equals(updateBy)) {
-            throw new QuestionUpdateFailedException();
-        }
-    }
-
-//    public boolean isDeletable(CrewMember crewMember) {
-//        return crewMember.isLeader() || crewMember.isCreatedBy(this.getCreatedBy());
-//    }
 }
