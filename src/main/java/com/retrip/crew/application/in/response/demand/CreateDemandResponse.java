@@ -10,10 +10,13 @@ public record CreateDemandResponse(
         @Schema(description = "크루 ID")
         UUID crewId,
 
+        @Schema(description = "참여 요청 ID")
+        UUID demandId,
+
         @Schema(description = "참여 요청자 ID")
         UUID memberId
 ) {
     public static CreateDemandResponse of(UUID crewId, Demand demand) {
-        return new CreateDemandResponse(crewId, demand.getMemberId());
+        return new CreateDemandResponse(crewId, demand.getId(), demand.getMemberId());
     }
 }

@@ -3,6 +3,7 @@ package com.retrip.crew.application.in.usecase;
 import com.retrip.crew.application.in.request.demand.CreateDemandRequest;
 import com.retrip.crew.application.in.request.crew.CrewOrder;
 import com.retrip.crew.application.in.request.demand.DemandOrder;
+import com.retrip.crew.application.in.request.demand.UpdateDemandRequest;
 import com.retrip.crew.application.in.response.demand.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,4 +23,8 @@ public interface ManageDemandUseCase {
     RejectDemandResponse rejectDemand(UUID crewId, UUID demandId, UUID memberId);
 
     ApproveDemandResponse approveDemand(UUID crewId, UUID demandId, UUID memberId);
+
+    MyDemandResponse getMyDemand(UUID crewId, UUID memberId);
+
+    UpdateDemandResponse updateDemand(UUID crewId, UpdateDemandRequest request);
 }

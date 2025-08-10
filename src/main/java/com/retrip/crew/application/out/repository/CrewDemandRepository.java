@@ -15,4 +15,7 @@ public interface CrewDemandRepository extends ReadRepository<Demand, UUID> {
 
     @Query("select d, c from Demand d join fetch d.crew c where d.id = :demandId and c.id = :crewId")
     Optional<Demand> findCrewByIdAndCrewId(UUID demandId, UUID crewId);
+
+    @Query("select d from Demand d join fetch d.answers where d.crew.id = :crewId and d.memberId = :memberId and d.status <> 'CANCELED'")
+    Optional<Demand> findByCrewIdAndMemberId(UUID crewId, UUID memberId);
 }

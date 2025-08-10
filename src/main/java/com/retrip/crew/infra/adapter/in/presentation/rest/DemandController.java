@@ -5,6 +5,7 @@ import com.retrip.crew.application.in.request.UpdateRecruitmentQuestionRequest;
 import com.retrip.crew.application.in.request.crew.CrewOrder;
 import com.retrip.crew.application.in.request.demand.CreateDemandRequest;
 import com.retrip.crew.application.in.request.demand.DemandOrder;
+import com.retrip.crew.application.in.request.demand.UpdateDemandRequest;
 import com.retrip.crew.application.in.response.CreateRecruitmentQuestionResponse;
 import com.retrip.crew.application.in.response.RecruitmentQuestionResponse;
 import com.retrip.crew.application.in.response.UpdateRecruitmentQuestionResponse;
@@ -16,6 +17,8 @@ import com.retrip.crew.infra.adapter.in.presentation.rest.common.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -151,6 +154,24 @@ public class DemandController {
             @PathVariable final UUID crewId,
             @RequestParam final UUID memberId) {
         List<RecruitmentQuestionResponse> response = manageRecruitmentQuestionUseCase.getRecruitmentQuestions(crewId, memberId);
+        return ApiResponse.ok(response);
+    }
+
+    @GetMapping("/{crewId}/demands/my-demand")
+    @Schema(description = "내 크루 참여 요청 조회")
+    public ApiResponse<MyDemandResponse> getMyDemand(
+            @PathVariable final UUID crewId,
+            @RequestParam final UUID memberId) { // TODO: 로그인 구현 시 @AuthenticationPrincipal 등으로 교체
+        MyDemandResponse myDemand = manageDemandUseCase.getMyDemand(crewId, memberId);
+        return ApiResponse.ok(myDemand);
+    }
+
+    @PutMapping("/{crewId}/demands/my-demand")
+    @Schema(description = "내 크루 참여 요청 수정")
+    public ApiResponse<UpdateDemandResponse> updateMyDemand(
+            @PathVariable final UUID crewId,
+            @RequestBody @Valid final UpdateDemandRequest request) {
+        UpdateDemandResponse response = manageDemandUseCase.updateDemand(crewId, request);
         return ApiResponse.ok(response);
     }
 }
