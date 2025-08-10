@@ -6,6 +6,8 @@ import static com.retrip.crew.common.fixture.CrewFixture.createCrew;
 import static com.retrip.crew.common.fixture.CrewFixture.createCrewRequest;
 import static com.retrip.crew.common.fixture.CrewFixture.createDefaultQuestions;
 import static com.retrip.crew.common.fixture.CrewFixture.createMultipleCrews;
+import static com.retrip.crew.common.fixture.CrewFixture.정수_ID;
+import static com.retrip.crew.common.fixture.CrewFixture.홍석_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -16,18 +18,22 @@ import com.retrip.crew.application.in.request.IntroductionUpdateRequest;
 import com.retrip.crew.application.in.request.crew.CrewCreateRequest;
 import com.retrip.crew.application.in.request.crew.CrewOrder;
 import com.retrip.crew.application.in.request.crew.CrewUpdateRequest;
+import com.retrip.crew.application.in.request.demand.CreateDemandRequest;
 import com.retrip.crew.application.in.response.IntroductionCreateResponse;
 import com.retrip.crew.application.in.response.IntroductionDetailResponse;
+import com.retrip.crew.application.in.response.crew.CrewBanListResponse;
 import com.retrip.crew.application.in.response.crew.CrewCreateResponse;
 import com.retrip.crew.application.in.response.crew.CrewDetailResponse;
 import com.retrip.crew.application.in.response.crew.CrewListResponse;
 import com.retrip.crew.application.in.response.crew.CrewUpdateResponse;
+import com.retrip.crew.application.in.response.demand.CreateDemandResponse;
 import com.retrip.crew.common.ServiceTest;
 import com.retrip.crew.domain.entity.Crew;
 import com.retrip.crew.domain.entity.CrewMemberRole;
 import com.retrip.crew.domain.entity.Demand;
 import com.retrip.crew.domain.entity.Introduction;
 import com.retrip.crew.domain.exception.NotCrewLeaderException;
+import com.retrip.crew.domain.exception.common.BusinessException;
 import com.retrip.crew.domain.exception.common.InvalidAccessException;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
 import java.util.List;
@@ -300,5 +306,84 @@ class CrewServiceTest extends ServiceTest {
 
         // when && then
         assertThrows(NotCrewLeaderException.class, () -> crewService.deleteCrew(savedCrew.getId(), MEMBER_ID));
+    }
+
+    @Test
+    void 크루_멤버를_추방하면_멤버에서_제외되고_크루차단대상에_들어간다() {
+        // given
+        Crew crew = Crew.create(
+                "속초 크루원 구함",
+                "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
+                100,
+                LEADER_ID,
+                createDefaultQuestions()
+        );
+        Crew savedCrew = crewRepository.save(crew);
+        Demand demand = savedCrew.demand(정수_ID);
+        savedCrew.approveDemand(demand);
+
+        //when
+        crewService.expelMember(LEADER_ID, savedCrew.getId(), 정수_ID);
+
+        //then
+        assertThat(savedCrew.getCrewBanMembers().getValues().stream().anyMatch(member -> member.getMemberId().equals(정수_ID))).isTrue();
+    }
+
+    @Test
+    void 크루_리더가_특정_회원_차단하면_크루차단대상에_들어간다() {
+        // given
+        Crew crew = Crew.create(
+                "속초 크루원 구함",
+                "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
+                100,
+                LEADER_ID,
+                createDefaultQuestions()
+        );
+        Crew savedCrew = crewRepository.save(crew);
+
+        //when
+        crewService.banMember(LEADER_ID, savedCrew.getId(), 정수_ID);
+
+        //then
+        assertThat(savedCrew.getCrewBanMembers().getValues().stream().anyMatch(member -> member.getMemberId().equals(정수_ID))).isTrue();
+    }
+
+    @Test
+    void 크루_리더는_크루차단목록을_확인할_수_있다() {
+        // given
+        Crew crew = Crew.create(
+                "속초 크루원 구함",
+                "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
+                100,
+                LEADER_ID,
+                createDefaultQuestions()
+        );
+        Crew savedCrew = crewRepository.save(crew);
+        crewService.banMember(LEADER_ID, savedCrew.getId(), 정수_ID);
+        crewService.banMember(LEADER_ID, savedCrew.getId(), 홍석_ID);
+
+        //when
+        CrewBanListResponse banMembers = crewService.getBanMembers(LEADER_ID, savedCrew.getId());
+
+        //then
+        assertThat(banMembers.banMembers().stream().allMatch(m -> List.of(정수_ID, 홍석_ID).contains(m.bannedMemberIds()))).isTrue();
+    }
+
+    @Test
+    void 크루_차단목록에_들어가면_크루_가입신청이_불가능_하다() {
+        // given
+        Crew crew = Crew.create(
+                "속초 크루원 구함",
+                "속초 친구 구합니다! 나이는 20~40.. 많은 가입 부탁드립니다.",
+                100,
+                LEADER_ID,
+                createDefaultQuestions()
+        );
+        Crew savedCrew = crewRepository.save(crew);
+        crewService.banMember(LEADER_ID, savedCrew.getId(), 정수_ID);
+        CreateDemandRequest request = new CreateDemandRequest(정수_ID);
+
+        //when && then
+        assertThrows(BusinessException.class, () -> demandService.createDemand(savedCrew.getId(), request));
     }
 }

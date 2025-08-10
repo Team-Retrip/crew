@@ -11,7 +11,7 @@ public record CrewBanListResponse(
         @Schema(description = "차단한 회원 리스트")
         List<BanMemberResponse> banMembers
 ) {
-        public static CrewBanListResponse from(List<CrewBanMember> crewBanMembers) {
+        public static CrewBanListResponse of(List<CrewBanMember> crewBanMembers) {
                 return new CrewBanListResponse(BanMemberResponse.toList(crewBanMembers));
         }
 

@@ -5,6 +5,6 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface CrewBanMemberRepository extends JpaRepository<CrewBanMember, UUID> {
+public interface CrewBanMemberRepository extends ReadRepository<CrewBanMember, UUID> {
     List<CrewBanMember> findAllByCrewId(UUID crewId);
 }

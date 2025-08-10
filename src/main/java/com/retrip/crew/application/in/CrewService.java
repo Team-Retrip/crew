@@ -174,6 +174,6 @@ public class CrewService implements ManageCrewUseCase, GetCrewUseCase, ManageInt
         Crew crew = findCrewById(crewId);
         crew.validateCrewLeader(loginMemberId);
         List<CrewBanMember> crewBanMembers = crewBanMemberRepository.findAllByCrewId(crewId);
-        return CrewBanListResponse.from(crewBanMembers);
+        return CrewBanListResponse.of(crewBanMembers);
     }
 }

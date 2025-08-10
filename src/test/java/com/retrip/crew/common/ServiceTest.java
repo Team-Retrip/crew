@@ -35,6 +35,9 @@ public class ServiceTest {
     protected IntroductionQueryRepository introductionQueryRepository;
 
     @Autowired
+    protected CrewBanMemberRepository crewBanMemberRepository;
+
+    @Autowired
     protected RecruitmentQuestionQueryRepository recruitmentQuestionQueryRepository;
 
     @Autowired
@@ -49,7 +52,7 @@ public class ServiceTest {
 
     @BeforeEach
     void setUp() {
-        crewService = new CrewService(crewRepository, crewMemberRepository, crewQueryRepository,  introductionRepository, introductionQueryRepository);
+        crewService = new CrewService(crewRepository, crewMemberRepository, crewQueryRepository,  introductionRepository, crewBanMemberRepository, introductionQueryRepository);
         demandService = new DemandService(crewRepository, demandRepository, crewQueryRepository, recruitmentQuestionRepository, recruitmentQuestionQueryRepository);
     }
 }
