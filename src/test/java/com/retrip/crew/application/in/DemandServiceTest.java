@@ -5,18 +5,22 @@ import com.retrip.crew.application.in.request.UpdateRecruitmentQuestionRequest;
 import com.retrip.crew.application.in.request.crew.CrewOrder;
 import com.retrip.crew.application.in.request.demand.CreateDemandRequest;
 import com.retrip.crew.application.in.request.demand.DemandOrder;
+import com.retrip.crew.application.in.request.demand.UpdateDemandRequest;
 import com.retrip.crew.application.in.response.CreateRecruitmentQuestionResponse;
 import com.retrip.crew.application.in.response.RecruitmentQuestionResponse;
 import com.retrip.crew.application.in.response.UpdateRecruitmentQuestionResponse;
 import com.retrip.crew.application.in.response.demand.CreateDemandResponse;
 import com.retrip.crew.application.in.response.demand.CrewsOfDemandResponse;
 import com.retrip.crew.application.in.response.demand.DemandsResponse;
+import com.retrip.crew.application.in.response.demand.MyDemandResponse;
 import com.retrip.crew.common.ServiceTest;
 import com.retrip.crew.domain.entity.Crew;
 import com.retrip.crew.domain.entity.Demand;
 import com.retrip.crew.domain.entity.RecruitmentQuestion;
 import com.retrip.crew.domain.exception.DuplicateDemandException;
-import com.retrip.crew.domain.exception.QuestionNotFoundException;
+import com.retrip.crew.domain.exception.IllegalDemandStateException; // 수정된 import
+import com.retrip.crew.domain.exception.common.EntityNotFoundException;
+import com.retrip.crew.domain.exception.common.InvalidValueException;
 import com.retrip.crew.domain.vo.DemandStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,21 +30,30 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.retrip.crew.common.fixture.CrewFixture.*;
-import static com.retrip.crew.common.fixture.CrewFixture.LEADER_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class DemandServiceTest extends ServiceTest {
+
+    private List<CreateDemandRequest.AnswerRequest> createValidAnswersForCrew(Crew crew, String content) {
+        return crew.getRecruitment().getRecruitmentQuestions().getValues().stream()
+                .map(q -> new CreateDemandRequest.AnswerRequest(q.getId(), content))
+                .collect(Collectors.toList());
+    }
+
     @Test
     void 크루_참여_요청을_생성한다() {
         // given
         Crew crew = crewRepository.save(createCrew(LEADER_ID));
-        CreateDemandRequest request = new CreateDemandRequest(MEMBER_ID);
+        List<CreateDemandRequest.AnswerRequest> answerRequests = createValidAnswersForCrew(crew, "열정적으로 참여하겠습니다!");
+        CreateDemandRequest request = new CreateDemandRequest(MEMBER_ID, answerRequests);
 
         // when
         CreateDemandResponse response = demandService.createDemand(crew.getId(), request);
@@ -48,8 +61,9 @@ class DemandServiceTest extends ServiceTest {
         // then
         List<Demand> demands = crew.getRecruitment().getDemands();
         assertAll(
-                () -> assertThat(demands.size()).isEqualTo(1),
-                () -> assertThat(response.memberId()).isEqualTo(demands.get(0).getMemberId())
+                () -> assertThat(demands).hasSize(1),
+                () -> assertThat(response.memberId()).isEqualTo(demands.get(0).getMemberId()),
+                () -> assertThat(demands.get(0).getAnswers()).hasSize(answerRequests.size())
         );
     }
 
@@ -58,13 +72,13 @@ class DemandServiceTest extends ServiceTest {
         // given
         Crew crew = createCrew(LEADER_ID);
         crew.demand(MEMBER_ID);
-        crew.demand(UUID.randomUUID());
-        crew.demand(UUID.randomUUID());
-        Crew save = crewRepository.save(crew);
-        CreateDemandRequest request = new CreateDemandRequest(MEMBER_ID);
+        Crew savedCrew = crewRepository.save(crew);
+
+        List<CreateDemandRequest.AnswerRequest> answerRequests = createValidAnswersForCrew(savedCrew, "다시 지원합니다!");
+        CreateDemandRequest request = new CreateDemandRequest(MEMBER_ID, answerRequests);
 
         // when, then
-        assertThatThrownBy(() -> demandService.createDemand(save.getId(), request))
+        assertThatThrownBy(() -> demandService.createDemand(savedCrew.getId(), request))
                 .isExactlyInstanceOf(DuplicateDemandException.class);
     }
 
@@ -142,8 +156,6 @@ class DemandServiceTest extends ServiceTest {
                 demandService.createRecruitmentQuestion(LEADER_ID, crew.getId(), request);
 
         // then
-
-        // then
         List<RecruitmentQuestion> questions = crew.getRecruitment().getRecruitmentQuestions().getValues();
         assertAll(
                 () -> assertThat(questions).hasSize(6),
@@ -210,5 +222,143 @@ class DemandServiceTest extends ServiceTest {
                         "크루에서 어떤 역할을 하고 싶나요?",
                         "추가로 하고 싶은 말이 있나요?"
                 );
+    }
+
+    @Test
+    void 답변_개수가_질문_개수와_다르면_예외가_발생한다() {
+        // given
+        Crew crew = crewRepository.save(createCrew(LEADER_ID));
+        CreateDemandRequest request = new CreateDemandRequest(MEMBER_ID, Collections.emptyList());
+
+        // when & then
+        assertThatThrownBy(() -> demandService.createDemand(crew.getId(), request))
+                .isInstanceOf(InvalidValueException.class)
+                .hasMessageContaining("개수가 일치하지 않습니다.");
+    }
+
+    @Test
+    void 답변_내용이_너무_길면_예외가_발생한다() {
+        // given
+        Crew crew = crewRepository.save(createCrew(LEADER_ID));
+        String longAnswer = "a".repeat(501);
+        List<CreateDemandRequest.AnswerRequest> answerRequests = createValidAnswersForCrew(crew, longAnswer);
+        CreateDemandRequest request = new CreateDemandRequest(MEMBER_ID, answerRequests);
+
+        // when & then
+        assertThatThrownBy(() -> demandService.createDemand(crew.getId(), request))
+                .isInstanceOf(InvalidValueException.class)
+                .hasMessageContaining("이하로 입력해야 합니다.");
+    }
+
+    @Test
+    void 다른_크루의_질문으로_답변하면_예외가_발생한다() {
+        // given
+        Crew crewA = crewRepository.save(createCrew(LEADER_ID));
+        Crew crewB = crewRepository.save(createCrew(UUID.randomUUID()));
+
+        RecruitmentQuestion questionFromCrewB = crewB.getRecruitment().getRecruitmentQuestions().getValues().get(0);
+        CreateDemandRequest.AnswerRequest invalidAnswer = new CreateDemandRequest.AnswerRequest(questionFromCrewB.getId(), "잘못된 답변");
+
+        List<CreateDemandRequest.AnswerRequest> answerRequests = crewA.getRecruitment().getRecruitmentQuestions().getValues().stream()
+                .skip(1)
+                .map(q -> new CreateDemandRequest.AnswerRequest(q.getId(), "정상 답변"))
+                .collect(Collectors.toList());
+        answerRequests.add(invalidAnswer);
+
+        CreateDemandRequest request = new CreateDemandRequest(MEMBER_ID, answerRequests);
+
+        // when & then
+        assertThatThrownBy(() -> demandService.createDemand(crewA.getId(), request))
+                .isInstanceOf(InvalidValueException.class)
+                .hasMessageContaining("해당 크루의 질문이 아닙니다.");
+    }
+
+    @Test
+    void 내_크루_참여_요청을_조회한다() {
+        // given
+        Crew crew = crewRepository.save(createCrew(LEADER_ID));
+        List<CreateDemandRequest.AnswerRequest> answerRequests = createValidAnswersForCrew(crew, "제 답변입니다.");
+        demandService.createDemand(crew.getId(), new CreateDemandRequest(MEMBER_ID, answerRequests));
+
+        // when
+        MyDemandResponse response = demandService.getMyDemand(crew.getId(), MEMBER_ID);
+
+        // then
+        assertAll(
+                () -> assertThat(response.crewId()).isEqualTo(crew.getId()),
+                () -> assertThat(response.status()).isEqualTo(DemandStatus.PENDING),
+                () -> assertThat(response.answers()).hasSize(5),
+                () -> assertThat(response.answers().get(0).answerContent()).isEqualTo("제 답변입니다.")
+        );
+    }
+
+    @Test
+    void 존재하지_않는_내_참여_요청을_조회하면_예외가_발생한다() {
+        // given
+        Crew crew = crewRepository.save(createCrew(LEADER_ID));
+
+        // when & then
+        assertThatThrownBy(() -> demandService.getMyDemand(crew.getId(), MEMBER_ID))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessageContaining("사용자의 참여 요청을 찾을 수 없습니다.");
+    }
+
+    @Test
+    void 내_크루_참여_요청을_수정한다() {
+        // given
+        Crew crew = crewRepository.save(createCrew(LEADER_ID));
+        List<CreateDemandRequest.AnswerRequest> initialAnswers = createValidAnswersForCrew(crew, "처음 쓴 답변");
+        demandService.createDemand(crew.getId(), new CreateDemandRequest(MEMBER_ID, initialAnswers));
+
+        List<UpdateDemandRequest.AnswerRequest> updatedAnswers = crew.getRecruitment().getRecruitmentQuestions().getValues().stream()
+                .map(q -> new UpdateDemandRequest.AnswerRequest(q.getId(), "새롭게 수정한 답변입니다."))
+                .toList();
+        UpdateDemandRequest updateRequest = new UpdateDemandRequest(MEMBER_ID, updatedAnswers);
+
+        // when
+        demandService.updateDemand(crew.getId(), updateRequest);
+        MyDemandResponse result = demandService.getMyDemand(crew.getId(), MEMBER_ID);
+
+        // then
+        assertThat(result.answers().get(0).answerContent()).isEqualTo("새롭게 수정한 답변입니다.");
+    }
+
+    @Test
+    void 대기상태가_아닌_참여_요청을_수정하려하면_예외가_발생한다() {
+        // given
+        Crew crew = crewRepository.save(createCrew(LEADER_ID));
+        List<CreateDemandRequest.AnswerRequest> answerRequests = createValidAnswersForCrew(crew, "답변");
+        CreateDemandResponse demandResponse = demandService.createDemand(crew.getId(), new CreateDemandRequest(MEMBER_ID, answerRequests));
+
+        demandService.approveDemand(crew.getId(), demandResponse.demandId(), LEADER_ID);
+
+        List<UpdateDemandRequest.AnswerRequest> updatedAnswers = createValidAnswersForCrew(crew, "수정 답변").stream()
+                .map(a -> new UpdateDemandRequest.AnswerRequest(a.questionId(), a.content()))
+                .toList();
+        UpdateDemandRequest updateRequest = new UpdateDemandRequest(MEMBER_ID, updatedAnswers);
+
+        // when & then
+        assertThatThrownBy(() -> demandService.updateDemand(crew.getId(), updateRequest))
+                .isExactlyInstanceOf(IllegalDemandStateException.class)
+                .hasMessageContaining("대기중인 참여 요청만 수정할 수 있습니다.");
+    }
+
+    @Test
+    void 다른사람의_참여_요청을_수정하려하면_예외가_발생한다() {
+        // given
+        Crew crew = crewRepository.save(createCrew(LEADER_ID));
+        List<CreateDemandRequest.AnswerRequest> answerRequests = createValidAnswersForCrew(crew, "원래 답변");
+        demandService.createDemand(crew.getId(), new CreateDemandRequest(MEMBER_ID, answerRequests));
+
+        UUID anotherMemberId = UUID.randomUUID();
+        List<UpdateDemandRequest.AnswerRequest> updatedAnswers = createValidAnswersForCrew(crew, "수정 답변").stream()
+                .map(a -> new UpdateDemandRequest.AnswerRequest(a.questionId(), a.content()))
+                .toList();
+        UpdateDemandRequest updateRequest = new UpdateDemandRequest(anotherMemberId, updatedAnswers);
+
+        // when & then
+        assertThatThrownBy(() -> demandService.updateDemand(crew.getId(), updateRequest))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessageContaining("사용자의 참여 요청을 찾을 수 없습니다.");
     }
 }
