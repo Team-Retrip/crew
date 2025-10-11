@@ -4,6 +4,7 @@ import com.retrip.crew.application.in.request.crew.CrewCreateRequest;
 import com.retrip.crew.application.in.request.crew.CrewLeaderDelegateRequest;
 import com.retrip.crew.application.in.request.crew.CrewUpdateRequest;
 import com.retrip.crew.application.in.request.crew.CrewWithdrawalRequest;
+import com.retrip.crew.application.in.response.crew.CrewBanListResponse;
 import com.retrip.crew.application.in.response.crew.CrewCreateResponse;
 import com.retrip.crew.application.in.response.crew.CrewLeaderDelegateResponse;
 import com.retrip.crew.application.in.response.crew.CrewUpdateResponse;
@@ -20,4 +21,11 @@ public interface ManageCrewUseCase {
     CrewLeaderDelegateResponse delegateCrewLeader(UUID crewId, CrewLeaderDelegateRequest request);
 
     void deleteCrew(UUID crewId, UUID loginMemberId);
+
+    void expelMember(UUID memberId, UUID crewId, UUID expellerId);
+
+    void banMember(UUID memberId, UUID crewId, UUID bannedMemberId);
+
+    CrewBanListResponse getBanMembers(UUID memberId, UUID crewId);
+
 }

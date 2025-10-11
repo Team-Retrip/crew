@@ -1,6 +1,9 @@
 package com.retrip.crew.domain.entity;
 
+import static com.retrip.crew.domain.exception.common.ErrorCode.CREW_MEMBER_BANNED_CANNOT_APPLY;
+
 import com.retrip.crew.domain.exception.NotCrewLeaderException;
+import com.retrip.crew.domain.exception.common.BusinessException;
 import com.retrip.crew.domain.vo.CrewDescription;
 import com.retrip.crew.domain.vo.CrewTitle;
 
@@ -45,6 +48,8 @@ public class Crew extends BaseEntity {
 
     @Embedded private Recruitment recruitment;
 
+    @Embedded private CrewBanMembers crewBanMembers;
+
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 
@@ -57,6 +62,7 @@ public class Crew extends BaseEntity {
         this.posts = new Posts();
         this.announcements = new Announcements();
         this.introductions = new Introductions();
+        this.crewBanMembers = new CrewBanMembers();
     }
 
     public static Crew create(String title, String description, int maxMembers, UUID leader, List<String> questions) {
@@ -86,6 +92,7 @@ public class Crew extends BaseEntity {
     }
 
     public Demand demand(UUID memberId) {
+        validateAddDemand(this.getId(), memberId);
         return recruitment.addDemand(memberId, this);
     }
 
@@ -125,5 +132,21 @@ public class Crew extends BaseEntity {
     public void deleteRecruitmentQuestion(UUID memberId, RecruitmentQuestion savedQuestion) {
         validateCrewLeader(memberId);
         recruitment.deleteRecruitmentQuestion(savedQuestion);
+    }
+
+    public void expelMember(UUID loginMemberId, UUID expellerId) {
+        this.crewMembers.expelMember(loginMemberId, expellerId);
+        this.crewBanMembers.banMember(this, expellerId);
+    }
+
+    public void banMember(UUID loginMemberId, UUID bannedMemberId) {
+        validateCrewLeader(loginMemberId);
+        this.crewBanMembers.banMember(this, bannedMemberId);
+    }
+
+    private void validateAddDemand(UUID crewId, UUID memberId) {
+        if(this.crewBanMembers.isBan(crewId, memberId)){
+            throw new BusinessException(CREW_MEMBER_BANNED_CANNOT_APPLY);
+        }
     }
 }

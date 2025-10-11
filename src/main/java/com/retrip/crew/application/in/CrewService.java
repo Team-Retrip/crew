@@ -25,6 +25,7 @@ import com.retrip.crew.domain.vo.IntroductionContent;
 import com.retrip.crew.domain.vo.IntroductionTitle;
 import com.retrip.crew.infra.adapter.in.presentation.rest.common.ScrollPageResponse;
 import com.retrip.crew.infra.util.PaginationUtils;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +41,7 @@ public class CrewService implements ManageCrewUseCase, GetCrewUseCase, ManageInt
     private final CrewMemberRepository crewMemberRepository;
     private final CrewQueryRepository crewQueryRepository;
     private final IntroductionRepository introductionRepository;
+    private final CrewBanMemberRepository crewBanMemberRepository;
     private final IntroductionQueryRepository introductionQueryRepository;
 
     @Override
@@ -153,5 +155,25 @@ public class CrewService implements ManageCrewUseCase, GetCrewUseCase, ManageInt
     public void deleteCrew(UUID crewId, UUID loginMemberId) {
         Crew crew = findCrewById(crewId);
         crew.softDelete(loginMemberId);
+    }
+
+    @Override
+    public void expelMember(UUID loginMemberId, UUID crewId, UUID expellerId) {
+        Crew crew = findCrewById(crewId);
+        crew.expelMember(loginMemberId, expellerId);
+    }
+
+    @Override
+    public void banMember(UUID loginMemberId, UUID crewId, UUID bannedMemberId) {
+        Crew crew = findCrewById(crewId);
+        crew.banMember(loginMemberId, bannedMemberId);
+    }
+
+    @Override
+    public CrewBanListResponse getBanMembers(UUID loginMemberId, UUID crewId) {
+        Crew crew = findCrewById(crewId);
+        crew.validateCrewLeader(loginMemberId);
+        List<CrewBanMember> crewBanMembers = crewBanMemberRepository.findAllByCrewId(crewId);
+        return CrewBanListResponse.of(crewBanMembers);
     }
 }
